@@ -9,7 +9,7 @@ import { Route, Switch } from "react-router-dom";
 
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
-import Splash from "./pages/Splash/Splash";
+import Landing from "./pages/Landing/Landing";
 
 // import { addresses, abis } from "@project/contracts";
 import GET_TRANSFERS from "./graphql/subgraph";
@@ -45,7 +45,7 @@ function App() {
 		<body className="flex flex-col">
 			<NavBar />
 			<Switch>
-				<Route path="/" component={Splash} exact />{" "}
+				<Route path="/" component={Landing} exact />{" "}
 			</Switch>
 			<Footer />
 		</body>
