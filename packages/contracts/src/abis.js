@@ -1,9 +1,9 @@
-import erc20Abi from "./abis/erc20.json";
-import ownableAbi from "./abis/ownable.json";
+import airdropAbi from "./abis/airdrop.json";
+import sweeperdaoAbi from "./abis/sweeperdao.json";
 
 const abis = {
-  erc20: erc20Abi,
-  ownable: ownableAbi,
+  airdrop: airdropAbi,
+  sweeperdao: sweeperdaoAbi,
 };
 
 export default abis;

@@ -16,24 +16,24 @@ import Dapp from "./pages/Dapp/Dapp";
 import GET_TRANSFERS from "./graphql/subgraph";
 
 function App() {
-	const { loading, error, data } = useQuery(GET_TRANSFERS);
+  const { loading, error, data } = useQuery(GET_TRANSFERS);
 
-	React.useEffect(() => {
-		if (!loading && !error && data && data.transfers) {
-		}
-	}, [loading, error, data]);
+  React.useEffect(() => {
+    if (!loading && !error && data && data.transfers) {
+    }
+  }, [loading, error, data]);
 
-	return (
-		<body className="flex flex-col">
-			<Route path="/" component={NavBar} exact />
-			<Switch>
-				<Route path="/" component={Landing} exact />
-				<Route path="/app" component={Dapp} exact />
-				<Route path="/app/*" component={Dapp} exact />
-			</Switch>
-			<Route path="/" component={Footer} exact />
-		</body>
-	);
+  return (
+    <body className="flex flex-col">
+      <Route path="/" component={NavBar} exact />
+      <Switch>
+        <Route path="/" component={Landing} exact />
+        <Route path="/app" component={Dapp} exact />
+        <Route path="/app/*" component={Dapp} exact />
+      </Switch>
+      <Route path="/" component={Footer} exact />
+    </body>
+  );
 }
 
 export default App;
