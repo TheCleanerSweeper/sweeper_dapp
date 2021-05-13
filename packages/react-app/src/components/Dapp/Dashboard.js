@@ -1,103 +1,71 @@
-import { PaperClipIcon } from "@heroicons/react/solid";
+import { ethers } from "ethers";
+import { useState, useEffect } from "react";
 
-export default function Dashboard() {
-  return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-      <div className="px-4 py-5 sm:px-6">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">
-          Applicant Information
-        </h3>
-        <p className="mt-1 max-w-2xl text-sm text-gray-500">
-          Personal details and application.
-        </p>
-      </div>
-      <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
-        <dl className="sm:divide-y sm:divide-gray-200">
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">Full name</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              Margot Foster
-            </dd>
-          </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">
-              Application for
-            </dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              Backend Developer
-            </dd>
-          </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">Email address</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              margotfoster@example.com
-            </dd>
-          </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">
-              Salary expectation
-            </dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              $120,000
-            </dd>
-          </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">About</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              Fugiat ipsum ipsum deserunt culpa aute sint do nostrud anim
-              incididunt cillum culpa consequat. Excepteur qui ipsum aliquip
-              consequat sint. Sit id mollit nulla mollit nostrud in ea officia
-              proident. Irure nostrud pariatur mollit ad adipisicing
-              reprehenderit deserunt qui eu.
-            </dd>
-          </div>
-          <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt className="text-sm font-medium text-gray-500">Attachments</dt>
-            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              <ul className="border border-gray-200 rounded-md divide-y divide-gray-200">
-                <li className="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
-                  <div className="w-0 flex-1 flex items-center">
-                    <PaperClipIcon
-                      className="flex-shrink-0 h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
-                    <span className="ml-2 flex-1 w-0 truncate">
-                      resume_back_end_developer.pdf
-                    </span>
-                  </div>
-                  <div className="ml-4 flex-shrink-0">
-                    <a
-                      href="#"
-                      className="font-medium text-indigo-600 hover:text-indigo-500"
-                    >
-                      Download
-                    </a>
-                  </div>
-                </li>
-                <li className="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
-                  <div className="w-0 flex-1 flex items-center">
-                    <PaperClipIcon
-                      className="flex-shrink-0 h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
-                    <span className="ml-2 flex-1 w-0 truncate">
-                      coverletter_back_end_developer.pdf
-                    </span>
-                  </div>
-                  <div className="ml-4 flex-shrink-0">
-                    <a
-                      href="#"
-                      className="font-medium text-indigo-600 hover:text-indigo-500"
-                    >
-                      Download
-                    </a>
-                  </div>
-                </li>
-              </ul>
-            </dd>
-          </div>
-        </dl>
-      </div>
-    </div>
-  );
+const getData = async (
+	sweeperContract,
+	provider,
+	setsupplyInfo,
+	setburnInfo
+) => {
+	const totalSupply = await sweeperContract.totalSupply();
+	const ts = ethers.utils.formatEther(totalSupply);
+	const fixedTS = Number(ts).toFixed(3);
+	const nice = ethers.utils.commify(fixedTS);
+	setsupplyInfo(nice);
+
+	const lastTransfer = await sweeperContract.lastTransfer();
+	const adjuster = await sweeperContract.ADJUSTER();
+	const latestHeight = await provider.getBlockNumber();
+	const latestBlock = await provider.getBlock(latestHeight);
+	const timeDifference = ethers.BigNumber.from(latestBlock.timestamp).sub(
+		lastTransfer
+	);
+	const difference = ethers.BigNumber.from(timeDifference).div(
+		ethers.BigNumber.from(adjuster)
+	);
+
+	const lowerFee = await sweeperContract.LOWER_FEE();
+	const upperFee = await sweeperContract.UPPER_FEE();
+
+	let fee = lowerFee.add(difference);
+	if (fee.toNumber() > upperFee.toNumber()) {
+		setburnInfo(upperFee.toNumber());
+	} else {
+		setburnInfo(fee.toNumber() - 100);
+	}
+};
+
+export default function Dashboard(props) {
+	const [supplyInfo, setsupplyInfo] = useState();
+	const [burnInfo, setburnInfo] = useState();
+
+	useEffect(() => {
+		if (props.sweeperContract) {
+			getData(props.sweeperContract, props.provider, setsupplyInfo, setburnInfo);
+		}
+	}, [props.sweeperContract, props.provider]);
+
+	return (
+		<>
+			<div className="mt-10 overflow-hidden shadow rounded-lg divide-y divide-gray-200 justify-center text-center text-3xl bg-gray-200">
+				<div className="px-4 py-3 sm:px-6 bg-gray-800 text-white">
+					📊 Dashboard 📊
+				</div>
+			</div>
+			<div className="flex flex-wrap">
+				<div className="flex-auto mr-3 mt-10 overflow-hidden shadow rounded-lg divide-y divide-gray-200 justify-center text-center text-3xl bg-gray-200">
+					<div className="block h-full px-4 py-3 sm:px-6 bg-gray-800 text-white">
+						<h4> Total Supply: </h4>
+						{supplyInfo}
+					</div>
+				</div>
+				<div className="flex-auto ml-3 mt-10 overflow-hidden shadow rounded-lg divide-y divide-gray-200 justify-center text-center text-3xl bg-gray-200">
+					<div className="block h-full px-4 py-3 sm:px-6 bg-gray-800 text-white">
+						<h4> Burn: </h4>
+						{burnInfo ? `${burnInfo}%` : ""}
+					</div>
+				</div>
+			</div>
+		</>
+	);
 }

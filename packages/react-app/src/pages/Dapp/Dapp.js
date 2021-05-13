@@ -1,23 +1,8 @@
 import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { Router, Route, Switch, useLocation } from "react-router-dom";
+import { Route, Switch, useLocation } from "react-router-dom";
 import { addresses, abis } from "@project/contracts";
-import {
-	CalendarIcon,
-	ChartBarIcon,
-	FolderIcon,
-	HomeIcon,
-	InboxIcon,
-	MenuIcon,
-	UsersIcon,
-	XIcon,
-	FireIcon,
-	CurrencyYenIcon,
-	GiftIcon,
-	SwitchHorizontalIcon,
-	LightningBoltIcon,
-	KeyIcon,
-} from "@heroicons/react/outline";
+import { HomeIcon, MenuIcon, XIcon, GiftIcon } from "@heroicons/react/outline";
 import styled from "styled-components";
 
 import { ethers } from "ethers";
@@ -27,22 +12,12 @@ import logo from "../../images/logo.svg";
 import EthIcon from "eth-icon";
 import Dashboard from "../../components/Dapp/Dashboard";
 import Claim from "../../components/Dapp/Claim";
-import Burn from "../../components/Dapp/Burn";
-import Wallet from "../../components/Dapp/Wallet";
 
 import { shortenAddress } from "../../utils/index";
-import { resultKeyNameFromField } from "apollo-utilities";
 
 const navigation = [
-	// { name: "Dashboard", href: "#/app/dashboard", icon: HomeIcon, current: true },
+	{ name: "Dashboard", href: "#/app/dashboard", icon: HomeIcon, current: true },
 	{ name: "Claim", href: "#/app/claim", icon: GiftIcon, current: false },
-	// { name: "Burn", href: "#/app/burn", icon: FireIcon, current: false },
-	// {
-	//   name: "Tokens",
-	//   href: "#/app/tokens",
-	//   icon: CurrencyYenIcon,
-	//   current: false,
-	// },
 	// {
 	//   name: "Swap",
 	//   href: "#/app/burn",
@@ -53,12 +28,6 @@ const navigation = [
 	//   name: "$SWEEP",
 	//   href: "#/app/burn",
 	//   icon: LightningBoltIcon,
-	//   current: false,
-	// },
-	// {
-	//   name: "Wallet",
-	//   href: "#/app/burn",
-	//   icon: KeyIcon,
 	//   current: false,
 	// },
 ];
@@ -72,10 +41,7 @@ const AddressBox = styled.div`
 	padding-bottom: 10%;
 	padding-right: 10%;
 	padding-left: 10%;
-	// border-radius: 15px;
-	// background-color: #8dcdce;
 	&: hover {
-		// border: 1px solid white;
 		background-color: #374151;
 		cursor: pointer;
 	}
@@ -86,10 +52,10 @@ export default function Dapp() {
 	const [address, setAddress] = useState();
 	const [provider, setProvider] = useState();
 	const [signer, setSigner] = useState();
+	const [sweeperContract, setsweeperContract] = useState();
 	const [sweeperBalance, setSweeperBalance] = useState(0);
 	const [hasMetamask, setHasMetamask] = useState();
 
-	let path = useLocation().pathname;
 	if (window.ethereum) {
 		window.ethereum.on("accountsChanged", function(accounts) {
 			// Time to reload your interface with accounts[0]!
@@ -132,10 +98,11 @@ export default function Dapp() {
 
 		const contractAddress = addresses.sweeperdaoBSCMainnet;
 		const abi = abis.sweeperdao;
-		const airdropContract = new ethers.Contract(contractAddress, abi, provider);
-		const balance = await airdropContract.balanceOf(address);
+		const sweeperContract = new ethers.Contract(contractAddress, abi, provider);
+		const balance = await sweeperContract.balanceOf(address);
 		const formattedBalance = ethers.utils.formatUnits(balance.toString(), 18);
 		setSweeperBalance(formattedBalance);
+		setsweeperContract(sweeperContract);
 	};
 
 	useEffect(() => {
@@ -343,34 +310,34 @@ export default function Dapp() {
 				</div>
 
 				<main className="flex-1 relative z-0 overflow-y-auto focus:outline-none bg-gradient-to-br  from-gray-700 via-gray-600 to-gray-700">
-					<div className="py-6">
-						<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-							{/* <h1 className="text-2xl font-semibold text-gray-900">{path}</h1> */}
-						</div>
-						<div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-							<div className="py-4">
-								<Switch>
-									{/* <Route path="/app/dashboard" component={Dashboard} /> */}
-									<Route
-										exact
-										path="/app/claim"
-										render={(props) => (
-											<Claim
-												address={address}
-												addEthereum={addEthereum}
-												provider={provider}
-												signer={signer}
-												sweeperBalance={sweeperBalance}
-											/>
-										)}
-									/>
-									<Route exact path="/app/burn" component={Burn} />
-									{/* <Route exact path="/app/tokens" component={Dashboard} />
-                  <Route exact path="/app/swap" component={Dashboard} />
-                  <Route exact path="/app/sweep" component={Dashboard} />
+					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+						{/* <h1 className="text-2xl font-semibold text-gray-900">{path}</h1> */}
+					</div>
+					<div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+						<div className="py-2">
+							<Switch>
+								<Route
+									path="/app/dashboard"
+									render={(props) => (
+										<Dashboard sweeperContract={sweeperContract} provider={provider} />
+									)}
+								/>
+								<Route
+									exact
+									path="/app/claim"
+									render={(props) => (
+										<Claim
+											address={address}
+											addEthereum={addEthereum}
+											provider={provider}
+											signer={signer}
+											sweeperBalance={sweeperBalance}
+										/>
+									)}
+								/>
+								{/* <Route exact path="/app/swap" component={Dashboard} />
                   <Route exact path="/app/wallet" component={Wallet} /> */}
-								</Switch>
-							</div>
+							</Switch>
 						</div>
 					</div>
 				</main>
