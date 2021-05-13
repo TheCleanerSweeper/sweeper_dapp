@@ -197,28 +197,28 @@ export default function Dapp() {
 								</nav>
 							</div>
 							<div className="flex-shrink-0 flex bg-gray-700 p-4">
-								<a href="#" className="flex-shrink-0 group block">
-									<div className="flex items-center">
-										<div>
-											<EthIcon
-												className="inline-block h-9 w-9 rounded-full"
-												// Address to draw
-												address={address}
-												// scale * 8 pixel image size
-												scale={16}
-												// <img> props
-												style={{
-													background: "red",
-												}}
-											/>
-										</div>
-										<div className="ml-3">
-											<p className="text-sm font-medium text-white">
-												{address ? shortenAddress(address) : "None Set"}
-											</p>
-										</div>
+								{/* <a href="#" className="flex-shrink-0 group block"> */}
+								<div className="flex items-center">
+									<div>
+										<EthIcon
+											className="inline-block h-9 w-9 rounded-full"
+											// Address to draw
+											address={address}
+											// scale * 8 pixel image size
+											scale={16}
+											// <img> props
+											style={{
+												background: "red",
+											}}
+										/>
 									</div>
-								</a>
+									<div className="ml-3">
+										<p className="text-sm font-medium text-white">
+											{address ? shortenAddress(address) : "None Set"}
+										</p>
+									</div>
+								</div>
+								{/* </a> */}
 							</div>
 						</div>
 					</Transition.Child>
