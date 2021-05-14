@@ -9,14 +9,14 @@ import { HashRouter } from "react-router-dom";
 // You should replace this url with your own and put it into a .env file
 // See all subgraphs: https://thegraph.com/explorer/
 const client = new ApolloClient({
-	uri: "https://api.thegraph.com/subgraphs/name/paulrberg/create-eth-app",
+  uri: "https://api.thegraph.com/subgraphs/name/paulrberg/create-eth-app"
 });
 
 ReactDOM.render(
-	<ApolloProvider client={client}>
-		<HashRouter>
-			<App />
-		</HashRouter>
-	</ApolloProvider>,
-	document.getElementById("root")
+  <ApolloProvider client={client}>
+    <HashRouter>
+      <App />
+    </HashRouter>
+  </ApolloProvider>,
+  document.getElementById("root")
 );

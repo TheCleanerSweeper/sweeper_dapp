@@ -94,7 +94,7 @@ export function ClaimModal(props) {
               scale={8}
               // <img> props
               style={{
-                background: "red",
+                background: "red"
               }}
             />
           ) : null}
@@ -413,7 +413,7 @@ export function ClaimAirdropPopup(props) {
                           hour: "numeric",
                           minute: "numeric",
                           timeZone: "utc",
-                          timeZoneName: "short",
+                          timeZoneName: "short"
                         })}
                       </p>
                     </div>

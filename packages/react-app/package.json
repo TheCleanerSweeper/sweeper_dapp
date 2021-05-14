@@ -56,11 +56,13 @@
     "start": "craco start",
     "build": "craco build && cp CNAME build/CNAME && cp src/data.json build/data.json",
     "test": "craco test",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "lint": "yarn prettier --write \"src/**/*.js\""
   },
   "devDependencies": {
     "autoprefixer": "^9.8.6",
     "postcss": "^7.0.35",
+    "prettier": "2.3.0",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.2"
   }
 }
