@@ -5,7 +5,7 @@ const Svg = styled.svg`
   flex-shrink: 0;
 `;
 
-const BunnyIcon = (props) => {
+const BunnyIcon = props => {
   return (
     <Svg
       viewBox="0 0 32 32"
@@ -101,7 +101,7 @@ const FallingBunnies = ({
   count = 30,
   size = 32,
   iterations = Infinity,
-  duration = 10,
+  duration = 10
 }) => {
   const bunnies = [...Array(count)].map((_, index) => (
     <Bunny
