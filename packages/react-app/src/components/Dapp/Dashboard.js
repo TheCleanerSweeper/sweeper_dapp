@@ -57,19 +57,35 @@ export default function Dashboard(props) {
           📊 Dashboard 📊
         </div>
       </div>
-      <div className="flex flex-wrap">
-        <div className="flex-auto mr-3 mt-10 overflow-hidden shadow rounded-lg divide-y divide-gray-200 justify-center text-center text-3xl bg-gray-200">
-          <div className="block h-full px-4 py-3 sm:px-6 bg-gray-800 text-white">
-            <h4> Total Supply: </h4>
-            {supplyInfo}
+      <div className="flex flex-wrap justify-center">
+        {props.sweeperContract ? (
+          <>
+            <div className="flex-auto mr-3 mt-10 overflow-hidden shadow rounded-lg divide-y divide-gray-200 justify-center text-center text-3xl bg-gray-200">
+              <div className="block h-full px-4 py-3 sm:px-6 bg-gray-800 text-white">
+                <h4> Total Supply: </h4>
+                {supplyInfo}
+              </div>
+            </div>
+            <div className="flex-auto ml-3 mt-10 overflow-hidden shadow rounded-lg divide-y divide-gray-200 justify-center text-center text-3xl bg-gray-200">
+              <div className="block h-full px-4 py-3 sm:px-6 bg-gray-800 text-white">
+                <h4> Burn: </h4>
+                {burnInfo ? `${burnInfo}%` : ""}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="mr-3 mt-10 overflow-hidden divide-y justify-center text-center text-3xl">
+            <div className="h-full px-4 py-3 sm:px-6 text-white">
+              <button
+                onClick={() => props.addEthereum()}
+                type="button"
+                className=" inline-flex ml-4 justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+              >
+                Connect wallet to see stats
+              </button>
+            </div>
           </div>
-        </div>
-        <div className="flex-auto ml-3 mt-10 overflow-hidden shadow rounded-lg divide-y divide-gray-200 justify-center text-center text-3xl bg-gray-200">
-          <div className="block h-full px-4 py-3 sm:px-6 bg-gray-800 text-white">
-            <h4> Burn: </h4>
-            {burnInfo ? `${burnInfo}%` : ""}
-          </div>
-        </div>
+        )}
       </div>
     </>
   );

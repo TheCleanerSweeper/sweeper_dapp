@@ -332,6 +332,7 @@ export default function Dapp() {
                     <Dashboard
                       sweeperContract={sweeperContract}
                       provider={provider}
+                      addEthereum={addEthereum}
                     />
                   )}
                 />
