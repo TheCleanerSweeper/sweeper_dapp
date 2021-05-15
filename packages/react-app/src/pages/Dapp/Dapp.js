@@ -2,7 +2,7 @@ import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Route, Switch, useLocation } from "react-router-dom";
 import { addresses, abis } from "@project/contracts";
-import { HomeIcon, MenuIcon, XIcon, GiftIcon } from "@heroicons/react/outline";
+import { MenuIcon, XIcon, GiftIcon } from "@heroicons/react/outline";
 import styled from "styled-components";
 
 import { ethers } from "ethers";
@@ -10,20 +10,14 @@ import { ethers } from "ethers";
 import logo from "../../images/logo.svg";
 
 import EthIcon from "eth-icon";
-import Dashboard from "../../components/Dapp/Dashboard";
 import Claim from "../../components/Dapp/Claim";
+import Popup from "../../components/Dapp/Popup";
 
 import { shortenAddress } from "../../utils/index";
 
 const navigation = [
-  { name: "Dashboard", href: "#/app/dashboard", icon: HomeIcon, current: true },
-  { name: "Claim", href: "#/app/claim", icon: GiftIcon, current: false }
-  // {
-  //   name: "Swap",
-  //   href: "#/app/burn",
-  //   icon: SwitchHorizontalIcon,
-  //   current: false,
-  // },
+  // { name: "Dashboard", href: "#/app/dashboard", icon: HomeIcon, current: true },
+  { name: "Claim", href: "#/app/claim", icon: GiftIcon, current: false },
   // {
   //   name: "$SWEEP",
   //   href: "#/app/burn",
@@ -41,8 +35,6 @@ const AddressBox = styled.div`
   padding-bottom: 10%;
   padding-right: 10%;
   padding-left: 10%;
-  // border-radius: 15px;
-  // background-color: #8dcdce;
   &: hover {
     // border: 1px solid white;
     background-color: #374151;
@@ -57,11 +49,11 @@ export default function Dapp() {
   const [signer, setSigner] = useState();
   const [sweeperBalance, setSweeperBalance] = useState(0);
   const [hasMetamask, setHasMetamask] = useState();
-  const [sweeperContract, setsweeperContract] = useState();
+  const [correctChain, setCorrectChain] = useState(false);
 
   let path = useLocation().pathname;
   if (window.ethereum) {
-    window.ethereum.on("accountsChanged", function(accounts) {
+    window.ethereum.on("accountsChanged", function (accounts) {
       // Time to reload your interface with accounts[0]!
       setAddress(accounts[0]);
     });
@@ -75,7 +67,7 @@ export default function Dapp() {
     }
     setHasMetamask(true);
     var accountsOnEnable = await window.ethereum.request({
-      method: "eth_requestAccounts"
+      method: "eth_requestAccounts",
     });
 
     if (!window.ethereum) {
@@ -87,6 +79,11 @@ export default function Dapp() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     setProvider(provider);
 
+    const network = await provider.getNetwork();
+    if (network.chainId != 56 && network.chainId != 5) {
+      setCorrectChain(true);
+      return;
+    }
     // The Metamask plugin also allows signing transactions to
     // send ether and pay to change state within the blockchain.
     // For this, you need the account signer...
@@ -117,6 +114,26 @@ export default function Dapp() {
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
+      {correctChain ? (
+        <Popup
+          title="Incorrect Chain"
+          open={correctChain}
+          setOpen={setCorrectChain}
+        >
+          <p className="text-sm text-gray-500">
+            The wallet you are using is not connected to the correct chain. To
+            connect your wallet to Binance smart chain, please see this guide
+            for metamask.
+            <a
+              href="https://academy.binance.com/en/articles/connecting-metamask-to-binance-smart-chain"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              https://academy.binance.com/en/articles/connecting-metamask-to-binance-smart-chain
+            </a>
+          </p>
+        </Popup>
+      ) : null}
       <Transition.Root show={sidebarOpen} as={Fragment}>
         <Dialog
           as="div"
@@ -175,7 +192,7 @@ export default function Dapp() {
                   </a>
                 </div>
                 <nav className="mt-5 px-2 space-y-1">
-                  {navigation.map(item => (
+                  {navigation.map((item) => (
                     <a
                       key={item.name}
                       href={item.href}
@@ -201,20 +218,26 @@ export default function Dapp() {
                 </nav>
               </div>
               <div className="flex-shrink-0 flex bg-gray-700 p-4">
-                {/* <a href="#" className="flex-shrink-0 group block"> */}
-                <div className="flex items-center">
-                  <div>
-                    <EthIcon
-                      className="inline-block h-9 w-9 rounded-full"
-                      // Address to draw
-                      address={address}
-                      // scale * 8 pixel image size
-                      scale={16}
-                      // <img> props
-                      style={{
-                        background: "red"
-                      }}
-                    />
+                <a href="#" className="flex-shrink-0 group block">
+                  <div className="flex items-center">
+                    <div>
+                      <EthIcon
+                        className="inline-block h-9 w-9 rounded-full"
+                        // Address to draw
+                        address={address}
+                        // scale * 8 pixel image size
+                        scale={16}
+                        // <img> props
+                        style={{
+                          background: "red",
+                        }}
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-white">
+                        {address ? shortenAddress(address) : "None Set"}
+                      </p>
+                    </div>
                   </div>
                   <div className="ml-3">
                     <p className="text-sm font-medium text-white">
@@ -247,7 +270,7 @@ export default function Dapp() {
                 </a>
               </div>
               <nav className="mt-5 flex-1 px-2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-800 space-y-1">
-                {navigation.map(item => (
+                {navigation.map((item) => (
                   <a
                     key={item.name}
                     href={item.href}
@@ -286,7 +309,7 @@ export default function Dapp() {
                     scale={16}
                     // <img> props
                     style={{
-                      background: "red"
+                      background: "red",
                     }}
                   />
                 </div>
@@ -320,38 +343,29 @@ export default function Dapp() {
         </div>
 
         <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none bg-gradient-to-br  from-gray-700 via-gray-600 to-gray-700">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* <h1 className="text-2xl font-semibold text-gray-900">{path}</h1> */}
-          </div>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-            <div className="py-2">
-              <Switch>
-                <Route
-                  path="/app/dashboard"
-                  render={props => (
-                    <Dashboard
-                      sweeperContract={sweeperContract}
-                      provider={provider}
-                      addEthereum={addEthereum}
-                    />
-                  )}
-                />
-                <Route
-                  exact
-                  path="/app/claim"
-                  render={props => (
-                    <Claim
-                      address={address}
-                      addEthereum={addEthereum}
-                      provider={provider}
-                      signer={signer}
-                      sweeperBalance={sweeperBalance}
-                    />
-                  )}
-                />
-                {/* <Route exact path="/app/swap" component={Dashboard} />
-                  <Route exact path="/app/wallet" component={Wallet} /> */}
-              </Switch>
+          <div className="py-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              {/* <h1 className="text-2xl font-semibold text-gray-900">{path}</h1> */}
+            </div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+              <div className="py-4">
+                <Switch>
+                  {/* <Route path="/app/dashboard" component={Dashboard} /> */}
+                  <Route
+                    exact
+                    path="/app/claim"
+                    render={(props) => (
+                      <Claim
+                        address={address}
+                        addEthereum={addEthereum}
+                        provider={provider}
+                        signer={signer}
+                        sweeperBalance={sweeperBalance}
+                      />
+                    )}
+                  />
+                </Switch>
+              </div>
             </div>
           </div>
         </main>

@@ -2,9 +2,10 @@ import { Fragment, useRef, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { GiftIcon } from "@heroicons/react/outline";
 import EthIcon from "eth-icon";
-import { ethers } from "ethers";
-
+import { useWeb3React } from "@web3-react/core";
 import { addresses, abis } from "@project/contracts";
+
+import Popup from "./Popup";
 import { getAirdropInfo, getClaimableAmount } from "../../utils/airdrop";
 import FallingBunnies from "../Effects";
 
@@ -60,52 +61,48 @@ const checkClaim = async (
   return;
 };
 
-export function ClaimModal(props) {
-  const addEthereum = props.addEthereum;
-  const provider = props.provider;
-  const signer = props.signer;
-  const balance = props.balance;
-
-  const setClaimableAmount = props.setClaimableAmount;
-  const setShowPopup = props.setShowPopup;
-  const setIsRedeemed = props.setIsRedeemed;
-  const setExpire = props.setExpire;
-  const setAirdropInfo = props.setAirdropInfo;
-  const setAirdropSigner = props.setAirdropSigner;
-
+export function ClaimModal({
+  address,
+  addEthereum,
+  provider,
+  signer,
+  balance,
+  setClaimableAmount,
+  setShowPopup,
+  setIsRedeemed,
+  setExpire,
+  setAirdropInfo,
+  setAirdropSigner,
+}) {
   return (
     <div className=" mt-16  overflow-hidden shadow rounded-lg divide-y divide-gray-200 justify-center text-center text-3xl bg-gray-200">
       <div className="px-4 py-5 sm:px-6 bg-gray-800 text-white">
-        {/* Content goes here */}
-        {/* We use less vertical padding on card headers on desktop than on body sections */}
         🎁 Claim Tokens 🎁
       </div>
       <div className="flex sm:p-6 h-auto h-auto text-2xl  mt-4 justify-center">
-        <div flex w-full pt-40 mb-36>
-          {props.address ? (
-            <EthIcon
-              className="inline-block h-9 w-9 rounded-full mx-3"
-              // Address to draw
-              address={props.address}
-              // scale * 8 pixel image size
-              scale={8}
-              // <img> props
-              style={{
-                background: "red"
-              }}
-            />
-          ) : null}
-          {props.address ? `Address: ${props.address}` : "Wallet Not Connected"}
-          {!props.address ? (
-            <button
-              onClick={() => addEthereum()}
-              type="button"
-              className=" inline-flex ml-4 justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
-            >
-              Connect Wallet
-            </button>
-          ) : null}
-        </div>
+        {address ? (
+          <EthIcon
+            className="inline-block h-9 w-9 rounded-full mx-3"
+            // Address to draw
+            address={address}
+            // scale * 8 pixel image size
+            scale={8}
+            // <img> props
+            style={{
+              background: "red",
+            }}
+          />
+        ) : null}
+        {address ? `Address: ${address}` : "Wallet Not Connected"}
+        {!address ? (
+          <button
+            onClick={() => addEthereum()}
+            type="button"
+            className=" inline-flex ml-4 justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+          >
+            Connect Wallet
+          </button>
+        ) : null}
       </div>
 
       {balance ? (
@@ -120,13 +117,13 @@ export function ClaimModal(props) {
         </div>
       ) : null}
 
-      {props.address ? (
+      {address ? (
         <button
           type="button"
           className="flex w-9/12 inline-flex justify-center rounded-md border border-gray-300 shadow-sm mb-10 py-4 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
           onClick={() => {
             checkClaim(
-              props.address,
+              address,
               // "0x949f435a2508f397c42b5b85993132de9600a3b9",
               provider,
               signer,
@@ -165,6 +162,8 @@ export default function Claim(props) {
 
   const [airdropInfo, setAirdropInfo] = useState();
 
+  const [open, setOpen] = useState(false);
+
   useEffect(() => {
     setBalance(props.sweeperBalance);
   }, [props.sweeperBalance]);
@@ -187,7 +186,13 @@ export default function Claim(props) {
         setAirdropInfo={setAirdropInfo}
         setAirdropSigner={setAirdropSigner}
       />
-      <ClaimInfoPopup />
+      <Popup title="Claim Airdrop" open={open} setOpen={setOpen}>
+        <p className="text-sm text-gray-500">
+          Allocations of $SWEEP are airdropped to rugpull victims and community
+          contributers. Continue on to check if your address is available to
+          earn $SWEEP.
+        </p>
+      </Popup>
       <ClaimAirdropPopup
         address={address}
         open={showPopup}
@@ -199,91 +204,6 @@ export default function Claim(props) {
         airdropSigner={airdropSigner}
       />
     </>
-  );
-}
-
-export function ClaimInfoPopup() {
-  const [open, setOpen] = useState(true);
-
-  const cancelButtonRef = useRef();
-
-  return (
-    <Transition.Root show={open} as={Fragment}>
-      <Dialog
-        as="div"
-        static
-        className="fixed z-10 inset-0 overflow-y-auto"
-        initialFocus={cancelButtonRef}
-        open={open}
-        onClose={setOpen}
-      >
-        <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-          </Transition.Child>
-
-          {/* This element is to trick the browser into centering the modal contents. */}
-          <span
-            className="hidden sm:inline-block sm:align-middle sm:h-screen"
-            aria-hidden="true"
-          >
-            &#8203;
-          </span>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            enterTo="opacity-100 translate-y-0 sm:scale-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-          >
-            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-              <div>
-                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                  <GiftIcon
-                    className="h-6 w-6 text-green-600"
-                    aria-hidden="true"
-                  />
-                </div>
-                <div className="mt-3 text-center sm:mt-5">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg leading-6 font-medium text-gray-900"
-                  >
-                    Claim Airdrop
-                  </Dialog.Title>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      Allocations of $SWEEP are airdropped to rugpull victims
-                      and community contributers. Continue on to check if your
-                      address is available to earn $SWEEP.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-5 sm:mt-6">
-                <button
-                  type="button"
-                  className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
-                  onClick={() => setOpen(false)}
-                >
-                  Okay
-                </button>
-              </div>
-            </div>
-          </Transition.Child>
-        </div>
-      </Dialog>
-    </Transition.Root>
   );
 }
 
@@ -409,7 +329,7 @@ export function ClaimAirdropPopup(props) {
                           hour: "numeric",
                           minute: "numeric",
                           timeZone: "utc",
-                          timeZoneName: "short"
+                          timeZoneName: "short",
                         })}
                       </p>
                     </div>
