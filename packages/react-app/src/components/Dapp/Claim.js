@@ -1,4 +1,3 @@
-/* This example requires Tailwind CSS v2.0+ */
 import { Fragment, useRef, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { GiftIcon } from "@heroicons/react/outline";
@@ -8,10 +7,7 @@ import { addresses, abis } from "@project/contracts";
 
 import Popup from "./Popup";
 import { getAirdropInfo, getClaimableAmount } from "../../utils/airdrop";
-
 import FallingBunnies from "../Effects";
-
-import { ethers } from "ethers";
 
 const redeem = async (address, amount, airdropInfo, airdropSigner) => {
   await airdropSigner.redeemPackage(
@@ -154,7 +150,6 @@ export default function Claim(props) {
   const addEthereum = props.addEthereum;
   const provider = props.provider;
   const signer = props.signer;
-  const sweeperBalance = props.sweeperBalance;
 
   const [balance, setBalance] = useState(props.sweeperBalance);
 

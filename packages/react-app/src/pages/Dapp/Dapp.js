@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { Router, Route, Switch, useLocation } from "react-router-dom";
+import { Route, Switch, useLocation } from "react-router-dom";
 import { addresses, abis } from "@project/contracts";
 import { MenuIcon, XIcon, GiftIcon } from "@heroicons/react/outline";
 import styled from "styled-components";
@@ -99,10 +99,11 @@ export default function Dapp() {
 
     const contractAddress = addresses.sweeperdaoBSCMainnet;
     const abi = abis.sweeperdao;
-    const airdropContract = new ethers.Contract(contractAddress, abi, provider);
-    const balance = await airdropContract.balanceOf(address);
+    const sweeperContract = new ethers.Contract(contractAddress, abi, provider);
+    const balance = await sweeperContract.balanceOf(address);
     const formattedBalance = ethers.utils.formatUnits(balance.toString(), 18);
     setSweeperBalance(formattedBalance);
+    setsweeperContract(sweeperContract);
   };
 
   useEffect(() => {
@@ -238,7 +239,13 @@ export default function Dapp() {
                       </p>
                     </div>
                   </div>
-                </a>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-white">
+                      {address ? shortenAddress(address) : "None Set"}
+                    </p>
+                  </div>
+                </div>
+                {/* </a> */}
               </div>
             </div>
           </Transition.Child>

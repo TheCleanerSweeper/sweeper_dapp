@@ -13,15 +13,10 @@ const SweepButton = styled.button`
     text-align: center;
     vertical-align: middle;
     cursor: pointer;
-  //   background-color: transparent;
     padding: 0.4375rem 1.5rem;
     font-size: 1rem;
     line-height: 1.5;
     border-radius: 0.3125rem;
-
-  //   box-shadow: 0 0 7px 1px rgba(230, 0, 122, 0.3) inset,
-  //   2px 2px 12px 0 rgba(230, 0, 122, 0.25),
-  //   -8px -8px 12px 0 rgba(0, 0, 0, 0.7);
 
     transition: all 0.2s ease-in-out;
     &: hover {
@@ -50,7 +45,7 @@ const NavBar = () => {
                 </a>
               </div>
               <div className=" md:flex items-center justify-end md:flex-1 lg:w-0">
-                <Link to={"/app/claim"}>
+                <Link to={"/app/dashboard"}>
                   <SweepButton className="bg-red">Sweep</SweepButton>
                 </Link>
               </div>

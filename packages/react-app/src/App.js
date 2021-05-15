@@ -1,6 +1,5 @@
 import React from "react";
 import { useQuery } from "@apollo/react-hooks";
-
 import { Route, Switch } from "react-router-dom";
 
 import NavBar from "./components/NavBar";
