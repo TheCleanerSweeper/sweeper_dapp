@@ -17,6 +17,7 @@
         "object-curly-newline": "off",
         "no-use-before-define": "off",
         "@typescript-eslint/no-use-before-define": ["error"],
+        // "react/jsx-first-prop-new-line": "never",
         "react/jsx-filename-extension": [
             "warn",
             {
@@ -42,7 +43,7 @@
         "max-len": [
             "warn",
             {
-                "code": 80
+                "code": 120
             }
         ],
         "react-hooks/rules-of-hooks": "error",

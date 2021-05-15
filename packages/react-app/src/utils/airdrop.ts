@@ -1,10 +1,17 @@
+/* eslint-disable */
 import { ethers } from 'ethers';
 import data from '../data.json';
 import goerlidata from '../goerlidata.json';
 
-export const getAirdropInfo = (address) => {
+export type AirdropData = {
+  amount: string;
+  index: number;
+  proof: [string];
+};
+
+export const getAirdropInfo = (address: string): AirdropData => {
   // const fs = require("fs");
-  let airdropData = data;
+  let airdropData: any = data;
 
   // let airdropData = JSON.parse(rawdata);
   airdropData = airdropData[`${address}`];
@@ -13,7 +20,7 @@ export const getAirdropInfo = (address) => {
   return airdropData;
 };
 
-export const getGoerliAirdropInfo = async (address) => {
+export const getGoerliAirdropInfo = async (address: string) => {
   const fs = require('fs');
 
   const rawdata = fs.readFileSync('../data.json');
@@ -36,12 +43,6 @@ export const getClaimableAmount = (airdropInfo) => {
 export const getAirdropContract = (contractAddress, abi, provider) => {
   const airdropContract = new ethers.Contract(contractAddress, abi, provider);
   return airdropContract;
-};
-
-// find out if they redeemed
-export const redeemed = async (web3, index) => {
-  const isRedeemed = await getAirdropContract(web3).redeemed(index);
-  return isRedeemed;
 };
 
 // to redeem

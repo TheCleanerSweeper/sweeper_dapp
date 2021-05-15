@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useEffect, useState } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import Web3Modal from 'web3modal';
@@ -35,13 +36,10 @@ function useWeb3Modal(config = {}) {
     setProvider(new Web3Provider(newProvider));
   }, [web3Modal]);
 
-  const logoutOfWeb3Modal = useCallback(
-    async () => {
-      await web3Modal.clearCachedProvider();
-      window.location.reload();
-    },
-    [web3Modal],
-  );
+  const logoutOfWeb3Modal = useCallback(async () => {
+    await web3Modal.clearCachedProvider();
+    window.location.reload();
+  }, [web3Modal]);
 
   // If autoLoad is enabled and the the wallet had been loaded before, load it automatically now.
   useEffect(() => {

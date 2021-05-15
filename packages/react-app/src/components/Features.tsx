@@ -15,8 +15,10 @@ const features = [
   },
   {
     name: 'Deflationary',
-    description:
-      'SweeperDAO will mint new tokens while burning shitcoins, to avoid a ever increasing supply there is a burning mechanesim. The mechanism is designed to either mint or burn tokens depending on useage of the token. If the token is being used heavily, users will need to burn a small portion of the tokens in order to complete the transaction.',
+    description: `SweeperDAO will mint new tokens while burning shitcoins, to avoid a ever increasing supply there 
+    is a burning mechanesim. The mechanism is designed to either mint or burn tokens depending on useage of the token.
+     If the token is being used heavily, users will need to burn a small portion of the tokens in order to complete the 
+     transaction.`,
     icon: LightningBoltIcon,
   },
   {
@@ -26,8 +28,9 @@ const features = [
   },
   {
     name: 'Owned and Goverened by the Community',
-    description:
-      'The token holders have complete control over the protocol and the treasury. The community can vote to decrease the burn rate, to burn a new token or to use the funds allocated to the treasury.',
+    description: `The token holders have complete control over the protocol and the treasury. 
+    The community can vote to decrease the burn rate, to burn a new token or to use the funds
+     allocated to the treasury.`,
     icon: GlobeAltIcon,
   },
   {
@@ -55,7 +58,10 @@ const Features: React.FunctionComponent = () => (
           {features.map((feature) => (
             <div key={feature.name} className="relative">
               <dt>
-                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
+                <div
+                  className="absolute flex items-center
+                justify-center h-12 w-12 rounded-md bg-indigo-500 text-white"
+                >
                   <feature.icon className="h-6 w-6" aria-hidden="true" />
                 </div>
                 <p className="ml-16 text-lg leading-6 font-medium text-gray-900">{feature.name}</p>
