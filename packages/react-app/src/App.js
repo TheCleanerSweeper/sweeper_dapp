@@ -1,10 +1,5 @@
 import React from "react";
-import { Contract } from "@ethersproject/contracts";
-import { getDefaultProvider } from "@ethersproject/providers";
 import { useQuery } from "@apollo/react-hooks";
-
-import useWeb3Modal from "./hooks/useWeb3Modal";
-import { ethers } from "ethers";
 
 import { Route, Switch } from "react-router-dom";
 
