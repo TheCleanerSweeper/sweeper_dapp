@@ -132,9 +132,7 @@ export default function Dapp() {
             </a>
           </p>
         </Popup>
-      ) : (
-        ""
-      )}
+      ) : null}
       <Transition.Root show={sidebarOpen} as={Fragment}>
         <Dialog
           as="div"
