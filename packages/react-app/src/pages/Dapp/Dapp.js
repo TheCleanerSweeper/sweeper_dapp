@@ -2,7 +2,7 @@ import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Route, Switch, useLocation } from "react-router-dom";
 import { addresses, abis } from "@project/contracts";
-import { MenuIcon, XIcon, GiftIcon } from "@heroicons/react/outline";
+import { HomeIcon, MenuIcon, XIcon, GiftIcon } from "@heroicons/react/outline";
 import styled from "styled-components";
 
 import { ethers } from "ethers";
@@ -11,13 +11,20 @@ import logo from "../../images/logo.svg";
 
 import EthIcon from "eth-icon";
 import Claim from "../../components/Dapp/Claim";
+import Dashboard from "../../components/Dapp/Dashboard";
 import Popup from "../../components/Dapp/Popup";
 
 import { shortenAddress } from "../../utils/index";
 
 const navigation = [
-  // { name: "Dashboard", href: "#/app/dashboard", icon: HomeIcon, current: true },
-  { name: "Claim", href: "#/app/claim", icon: GiftIcon, current: false },
+  { name: "Dashboard", href: "#/app/dashboard", icon: HomeIcon, current: true },
+  { name: "Claim", href: "#/app/claim", icon: GiftIcon, current: false }
+  // {
+  //   name: "Swap",
+  //   href: "#/app/burn",
+  //   icon: SwitchHorizontalIcon,
+  //   current: false,
+  // },
   // {
   //   name: "$SWEEP",
   //   href: "#/app/burn",
@@ -49,6 +56,7 @@ export default function Dapp() {
   const [signer, setSigner] = useState();
   const [sweeperBalance, setSweeperBalance] = useState(0);
   const [hasMetamask, setHasMetamask] = useState();
+  const [sweeperContract, setsweeperContract] = useState();
   const [correctChain, setCorrectChain] = useState(false);
 
   let path = useLocation().pathname;
@@ -218,26 +226,20 @@ export default function Dapp() {
                 </nav>
               </div>
               <div className="flex-shrink-0 flex bg-gray-700 p-4">
-                <a href="#" className="flex-shrink-0 group block">
-                  <div className="flex items-center">
-                    <div>
-                      <EthIcon
-                        className="inline-block h-9 w-9 rounded-full"
-                        // Address to draw
-                        address={address}
-                        // scale * 8 pixel image size
-                        scale={16}
-                        // <img> props
-                        style={{
-                          background: "red",
-                        }}
-                      />
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-white">
-                        {address ? shortenAddress(address) : "None Set"}
-                      </p>
-                    </div>
+                {/* <a href="#" className="flex-shrink-0 group block"> */}
+                <div className="flex items-center">
+                  <div>
+                    <EthIcon
+                      className="inline-block h-9 w-9 rounded-full"
+                      // Address to draw
+                      address={address}
+                      // scale * 8 pixel image size
+                      scale={16}
+                      // <img> props
+                      style={{
+                        background: "red"
+                      }}
+                    />
                   </div>
                   <div className="ml-3">
                     <p className="text-sm font-medium text-white">
@@ -343,29 +345,38 @@ export default function Dapp() {
         </div>
 
         <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none bg-gradient-to-br  from-gray-700 via-gray-600 to-gray-700">
-          <div className="py-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              {/* <h1 className="text-2xl font-semibold text-gray-900">{path}</h1> */}
-            </div>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-              <div className="py-4">
-                <Switch>
-                  {/* <Route path="/app/dashboard" component={Dashboard} /> */}
-                  <Route
-                    exact
-                    path="/app/claim"
-                    render={(props) => (
-                      <Claim
-                        address={address}
-                        addEthereum={addEthereum}
-                        provider={provider}
-                        signer={signer}
-                        sweeperBalance={sweeperBalance}
-                      />
-                    )}
-                  />
-                </Switch>
-              </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* <h1 className="text-2xl font-semibold text-gray-900">{path}</h1> */}
+          </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <div className="py-2">
+              <Switch>
+                <Route
+                  path="/app/dashboard"
+                  render={props => (
+                    <Dashboard
+                      sweeperContract={sweeperContract}
+                      provider={provider}
+                      addEthereum={addEthereum}
+                    />
+                  )}
+                />
+                <Route
+                  exact
+                  path="/app/claim"
+                  render={props => (
+                    <Claim
+                      address={address}
+                      addEthereum={addEthereum}
+                      provider={provider}
+                      signer={signer}
+                      sweeperBalance={sweeperBalance}
+                    />
+                  )}
+                />
+                {/* <Route exact path="/app/swap" component={Dashboard} />
+                  <Route exact path="/app/wallet" component={Wallet} /> */}
+              </Switch>
             </div>
           </div>
         </main>
