@@ -1,7 +1,8 @@
-import { Fragment, useState, useEffect } from "react";
-import { Dialog, Transition } from "@headlessui/react";
-import { Router, Route, Switch, useLocation } from "react-router-dom";
-import { addresses, abis } from "@project/contracts";
+import React from 'react';
+import { Fragment, useState, useEffect, ReactNode } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import { Router, Route, Switch, useLocation } from 'react-router-dom';
+import { addresses, abis } from '@project/contracts';
 import {
   CalendarIcon,
   ChartBarIcon,
@@ -16,26 +17,26 @@ import {
   GiftIcon,
   SwitchHorizontalIcon,
   LightningBoltIcon,
-  KeyIcon
-} from "@heroicons/react/outline";
-import styled from "styled-components";
+  KeyIcon,
+} from '@heroicons/react/outline';
+import styled from 'styled-components';
 
-import { ethers } from "ethers";
+import { ethers } from 'ethers';
 
-import logo from "../../images/logo.svg";
+import logo from '../../images/logo.svg';
 
-import EthIcon from "eth-icon";
-import Dashboard from "../../components/Dapp/Dashboard";
-import Claim from "../../components/Dapp/Claim";
-import Burn from "../../components/Dapp/Burn";
-import Wallet from "../../components/Dapp/Wallet";
+import EthIcon from 'eth-icon';
+import Dashboard from '../../components/Dapp/Dashboard';
+import Claim from '../../components/Dapp/Claim';
+import Burn from '../../components/Dapp/Burn';
+import Wallet from '../../components/Dapp/Wallet';
 
-import { shortenAddress } from "../../utils/index";
-import { resultKeyNameFromField } from "apollo-utilities";
+import { shortenAddress } from '../../utils/index';
+import { resultKeyNameFromField } from 'apollo-utilities';
 
 const navigation = [
   // { name: "Dashboard", href: "#/app/dashboard", icon: HomeIcon, current: true },
-  { name: "Claim", href: "#/app/claim", icon: GiftIcon, current: false }
+  { name: 'Claim', href: '#/app/claim', icon: GiftIcon, current: false },
   // { name: "Burn", href: "#/app/burn", icon: FireIcon, current: false },
   // {
   //   name: "Tokens",
@@ -64,7 +65,7 @@ const navigation = [
 ];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
+  return classes.filter(Boolean).join(' ');
 }
 
 const AddressBox = styled.div`
@@ -81,17 +82,17 @@ const AddressBox = styled.div`
   }
 `;
 
-export default function Dapp() {
+export default function Dapp(): ReactNode {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [address, setAddress] = useState();
-  const [provider, setProvider] = useState();
-  const [signer, setSigner] = useState();
-  const [sweeperBalance, setSweeperBalance] = useState(0);
+  const [address, setAddress] = useState('');
+  const [provider, setProvider] = useState(ethers.providers.Web3Provider);
+  const [signer, setSigner] = useState(ethers.providers.JsonRpcSigner);
+  const [sweeperBalance, setSweeperBalance] = useState('');
   const [hasMetamask, setHasMetamask] = useState();
 
   let path = useLocation().pathname;
   if (window.ethereum) {
-    window.ethereum.on("accountsChanged", function(accounts) {
+    window.ethereum.on('accountsChanged', function(accounts: [string]) {
       // Time to reload your interface with accounts[0]!
       setAddress(accounts[0]);
     });
@@ -105,7 +106,7 @@ export default function Dapp() {
     }
     setHasMetamask(true);
     var accountsOnEnable = await window.ethereum.request({
-      method: "eth_requestAccounts"
+      method: 'eth_requestAccounts',
     });
 
     if (!window.ethereum) {
@@ -198,9 +199,7 @@ export default function Dapp() {
                 <div className="flex-shrink-0 flex items-center px-4">
                   <a href="/" className="flex">
                     <img className="h-10 w-auto" src={logo} alt="" />
-                    <div className="w-auto flex items-center justify-center pl-4 text-xl text-white">
-                      SweeperDAO
-                    </div>
+                    <div className="w-auto flex items-center justify-center pl-4 text-xl text-white">SweeperDAO</div>
                   </a>
                 </div>
                 <nav className="mt-5 px-2 space-y-1">
@@ -209,18 +208,14 @@ export default function Dapp() {
                       key={item.name}
                       href={item.href}
                       className={classNames(
-                        item.current
-                          ? "bg-gray-900 text-white"
-                          : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                        "group flex items-center px-2 py-2 text-base font-medium rounded-md"
+                        item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                        'group flex items-center px-2 py-2 text-base font-medium rounded-md',
                       )}
                     >
                       <item.icon
                         className={classNames(
-                          item.current
-                            ? "text-gray-300"
-                            : "text-gray-400 group-hover:text-gray-300",
-                          "mr-4 h-6 w-6"
+                          item.current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300',
+                          'mr-4 h-6 w-6',
                         )}
                         aria-hidden="true"
                       />
@@ -241,23 +236,19 @@ export default function Dapp() {
                         scale={16}
                         // <img> props
                         style={{
-                          background: "red"
+                          background: 'red',
                         }}
                       />
                     </div>
                     <div className="ml-3">
-                      <p className="text-sm font-medium text-white">
-                        {address ? shortenAddress(address) : "None Set"}
-                      </p>
+                      <p className="text-sm font-medium text-white">{address ? shortenAddress(address) : 'None Set'}</p>
                     </div>
                   </div>
                 </a>
               </div>
             </div>
           </Transition.Child>
-          <div className="flex-shrink-0 w-14">
-            {/* Force sidebar to shrink to fit close icon */}
-          </div>
+          <div className="flex-shrink-0 w-14">{/* Force sidebar to shrink to fit close icon */}</div>
         </Dialog>
       </Transition.Root>
 
@@ -270,9 +261,7 @@ export default function Dapp() {
               <div className="flex items-center flex-shrink-0 px-4">
                 <a href="/" className="flex">
                   <img className="h-10 w-auto" src={logo} alt="" />
-                  <div className="w-auto flex items-center justify-center pl-4 text-xl text-white">
-                    SweeperDAO
-                  </div>
+                  <div className="w-auto flex items-center justify-center pl-4 text-xl text-white">SweeperDAO</div>
                 </a>
               </div>
               <nav className="mt-5 flex-1 px-2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-800 space-y-1">
@@ -281,18 +270,14 @@ export default function Dapp() {
                     key={item.name}
                     href={item.href}
                     className={classNames(
-                      item.current
-                        ? "bg-gray-900 text-white"
-                        : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                      "group flex items-center px-2 py-2 text-sm font-medium rounded-md"
+                      item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                      'group flex items-center px-2 py-2 text-sm font-medium rounded-md',
                     )}
                   >
                     <item.icon
                       className={classNames(
-                        item.current
-                          ? "text-gray-300"
-                          : "text-gray-400 group-hover:text-gray-300",
-                        "mr-3 h-6 w-6"
+                        item.current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300',
+                        'mr-3 h-6 w-6',
                       )}
                       aria-hidden="true"
                     />
@@ -301,10 +286,7 @@ export default function Dapp() {
                 ))}
               </nav>
             </div>
-            <AddressBox
-              className=" bg-gray-800 p-4"
-              onClick={() => addEthereum()}
-            >
+            <AddressBox className=" bg-gray-800 p-4" onClick={() => addEthereum()}>
               <div className="flex items-center">
                 <div>
                   <EthIcon
@@ -315,16 +297,14 @@ export default function Dapp() {
                     scale={16}
                     // <img> props
                     style={{
-                      background: "red"
+                      background: 'red',
                     }}
                   />
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-white">
-                    {address ? shortenAddress(address) : "None Set"}
-                  </p>
+                  <p className="text-sm font-medium text-white">{address ? shortenAddress(address) : 'None Set'}</p>
                   <p className="text-xs font-medium text-gray-300 group-hover:text-gray-200">
-                    {!address ? "Connect Wallet" : null}
+                    {!address ? 'Connect Wallet' : null}
                   </p>
                 </div>
               </div>

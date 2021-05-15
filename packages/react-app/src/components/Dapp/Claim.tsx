@@ -1,40 +1,32 @@
-/* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useRef, useState, useEffect } from "react";
-import { Dialog, Transition } from "@headlessui/react";
-import { GiftIcon } from "@heroicons/react/outline";
-import EthIcon from "eth-icon";
+import React, { Fragment, useRef, useState, useEffect, ReactNode } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import { GiftIcon } from '@heroicons/react/outline';
+import EthIcon from 'eth-icon';
+import { ethers } from 'ethers';
 
-import { addresses, abis } from "@project/contracts";
-import { getAirdropInfo, getClaimableAmount } from "../../utils/airdrop";
+import { addresses, abis } from '@project/contracts';
+import { getAirdropInfo, getClaimableAmount } from '../../utils/airdrop.js';
+import FallingBunnies from '../Effects.js';
 
-import FallingBunnies from "../Effects";
-
-import { ethers } from "ethers";
-
-const redeem = async (address, amount, airdropInfo, airdropSigner) => {
-  const claimed = await airdropSigner.redeemPackage(
-    airdropInfo.index,
-    address,
-    amount,
-    airdropInfo.proof
-  );
+const redeem = async (address, amount, airdropInfo, airdropSigner): none => {
+  await airdropSigner.redeemPackage(airdropInfo.index, address, amount, airdropInfo.proof);
 };
 
 const checkClaim = async (
-  address,
-  provider,
-  signer,
-  setClaimableAmount,
-  setShowPopup,
-  setIsRedeemed,
-  setExpire,
-  setAirdropInfo,
-  setAirdropSigner
-) => {
-  const contractAddress = addresses.airdropBSCMainnet;
+  address: any,
+  provider: any,
+  signer: any,
+  setClaimableAmount: any,
+  setShowPopup: any,
+  setIsRedeemed: any,
+  setExpire: any,
+  setAirdropInfo: any,
+  setAirdropSigner: any,
+): none => {
+  const contractAddress: string = addresses.airdropBSCMainnet;
   const abi = abis.airdrop;
-  const airdropContract = new ethers.Contract(contractAddress, abi, provider);
-  const airdrop = airdropContract.connect(signer);
+  const airdropContract: ethers.Contract = new ethers.Contract(contractAddress, abi, provider);
+  const airdrop: ethers.Contract = airdropContract.connect(signer);
   setAirdropSigner(airdrop);
 
   // Return details from the airdrop json
@@ -49,7 +41,8 @@ const checkClaim = async (
     const claimableAmount = getClaimableAmount(airdropInfo);
     const isRedeemed = await airdrop.redeemed(airdropInfo.index);
 
-    const expire = await airdrop._blockDeadline();
+    /* prettier-ignore */
+    const expire = await airdrop._blockDeadline(); // eslint-disable-line
     const date = new Date(expire.toString() * 1000);
 
     setIsRedeemed(isRedeemed);
@@ -59,28 +52,42 @@ const checkClaim = async (
   }
 
   setShowPopup(true);
-
-  return;
 };
 
-export function ClaimModal(props) {
-  const addEthereum = props.addEthereum;
-  const provider = props.provider;
-  const signer = props.signer;
-  const balance = props.balance;
+interface Props {
+  addEthereum: any;
+  provider: any;
+  signer: any;
+  balance: any;
+  setClaimableAmount: any;
+  setShowPopup: any;
+  setIsRedeemed: any;
+  setExpire: any;
+  setAirdropInfo: any;
+  setAirdropSigner: any;
+}
 
-  const setClaimableAmount = props.setClaimableAmount;
-  const setShowPopup = props.setShowPopup;
-  const setIsRedeemed = props.setIsRedeemed;
-  const setExpire = props.setExpire;
-  const setAirdropInfo = props.setAirdropInfo;
-  const setAirdropSigner = props.setAirdropSigner;
-
+export function ClaimModal({
+  addEthereum,
+  provider,
+  signer,
+  balance,
+  setClaimableAmount,
+  setShowPopup,
+  setIsRedeemed,
+  setExpire,
+  setAirdropInfo,
+  setAirdropSigner,
+}: props): ReactNode<Props> {
   return (
-    <div className=" mt-16  overflow-hidden shadow rounded-lg divide-y divide-gray-200 justify-center text-center text-3xl bg-gray-200">
-      <div className="px-4 py-5 sm:px-6 bg-gray-800 text-white">
-        {/* Content goes here */}
-        {/* We use less vertical padding on card headers on desktop than on body sections */}
+    <div
+      className="mt-16 overflow-hidden shadow rounded-lg
+     divide-y divide-gray-200 justify-center text-center text-3xl bg-gray-200"
+    >
+      <div
+        className="px-4 py-5 sm:px-6
+       bg-gray-800 text-white"
+      >
         🎁 Claim Tokens 🎁
       </div>
       <div className="flex sm:p-6 h-auto h-auto text-2xl  mt-4 justify-center">
@@ -94,16 +101,21 @@ export function ClaimModal(props) {
               scale={8}
               // <img> props
               style={{
-                background: "red"
+                background: 'red',
               }}
             />
           ) : null}
-          {props.address ? `Address: ${props.address}` : "Wallet Not Connected"}
+          {props.address ? `Address: ${props.address}` : 'Wallet Not Connected'}
           {!props.address ? (
             <button
               onClick={() => addEthereum()}
               type="button"
-              className=" inline-flex ml-4 justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+              className="
+              inline-flex ml-4 justify-center rounded-md border
+              border-gray-300 shadow-sm px-4 py-2 bg-white text-base
+              font-medium text-gray-700 hover:bg-gray-50 focus:outline-none
+              focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0
+              sm:col-start-1 sm:text-sm"
             >
               Connect Wallet
             </button>
@@ -114,10 +126,13 @@ export function ClaimModal(props) {
       {balance ? (
         <div className="flex sm:p-6  text-2xl  justify-center">
           <div flex w-full mb-36>
-            Balance:{" "}
-            <span className="rounded-md border border-gray-300 pt-2 pb-2 pl-4 pr-4 bg-gray-100">
+            Balance:{' '}
+            <span
+              className="rounded-md border border-gray-300 pt-2
+             pb-2 pl-4 pr-4 bg-gray-100"
+            >
               {balance}
-            </span>{" "}
+            </span>{' '}
             🧹$SWEEP🧹
           </div>
         </div>
@@ -126,7 +141,11 @@ export function ClaimModal(props) {
       {props.address ? (
         <button
           type="button"
-          className="flex w-9/12 inline-flex justify-center rounded-md border border-gray-300 shadow-sm mb-10 py-4 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+          className="flex w-9/12 inline-flex justify-center
+          rounded-md border border-gray-300 shadow-sm mb-10 py-4
+          bg-white text-base font-medium text-gray-700 hover:bg-gray-50
+          focus:outline-none focus:ring-2 focus:ring-offset-2
+          focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
           onClick={() => {
             checkClaim(
               props.address,
@@ -138,7 +157,7 @@ export function ClaimModal(props) {
               setIsRedeemed,
               setExpire,
               setAirdropInfo,
-              setAirdropSigner
+              setAirdropSigner,
             );
           }}
           // ref={cancelButtonRef}
@@ -150,14 +169,14 @@ export function ClaimModal(props) {
   );
 }
 
-export default function Claim(props) {
-  const address = props.address;
+interface ClaimProps {
+  address: any;
+  addEthereum: any;
+  provider: any;
+  signer: any;
+}
 
-  const addEthereum = props.addEthereum;
-  const provider = props.provider;
-  const signer = props.signer;
-  const sweeperBalance = props.sweeperBalance;
-
+export default function Claim({ address, addEthereum, provider, signer }: props): ReactNode<ClaimProps> {
   const [balance, setBalance] = useState(props.sweeperBalance);
 
   const [showPopup, setShowPopup] = useState(false);
@@ -175,9 +194,7 @@ export default function Claim(props) {
 
   return (
     <>
-      {showPopup && !isRedeemed && claimableAmount > 0 ? (
-        <FallingBunnies />
-      ) : null}
+      {showPopup && !isRedeemed && claimableAmount > 0 ? <FallingBunnies /> : null}
       <ClaimModal
         address={address}
         balance={balance}
@@ -221,7 +238,10 @@ export function ClaimInfoPopup() {
         open={open}
         onClose={setOpen}
       >
-        <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div
+          className="flex items-end justify-center min-h-screen 
+        pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -231,12 +251,15 @@ export function ClaimInfoPopup() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            <Dialog.Overlay
+              className="fixed inset-0 bg-gray-500 
+            bg-opacity-75 transition-opacity"
+            />
           </Transition.Child>
 
-          {/* This element is to trick the browser into centering the modal contents. */}
           <span
-            className="hidden sm:inline-block sm:align-middle sm:h-screen"
+            className="hidden sm:inline-block sm:align-middle 
+          sm:h-screen"
             aria-hidden="true"
           >
             &#8203;
@@ -250,26 +273,27 @@ export function ClaimInfoPopup() {
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <div
+              className="inline-block align-bottom 
+            bg-white rounded-lg px-4 pt-5 pb-4 text-left 
+            overflow-hidden shadow-xl transform transition-all 
+            sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+            >
               <div>
-                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                  <GiftIcon
-                    className="h-6 w-6 text-green-600"
-                    aria-hidden="true"
-                  />
+                <div
+                  className="mx-auto flex items-center 
+                justify-center h-12 w-12 rounded-full bg-green-100"
+                >
+                  <GiftIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
                 </div>
                 <div className="mt-3 text-center sm:mt-5">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg leading-6 font-medium text-gray-900"
-                  >
+                  <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
                     Claim Airdrop
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      Allocations of $SWEEP are airdropped to rugpull victims
-                      and community contributers. Continue on to check if your
-                      address is available to earn $SWEEP.
+                      Allocations of $SWEEP are airdropped to rugpull victims and community contributers. Continue on to
+                      check if your address is available to earn $SWEEP.
                     </p>
                   </div>
                 </div>
@@ -277,7 +301,12 @@ export function ClaimInfoPopup() {
               <div className="mt-5 sm:mt-6">
                 <button
                   type="button"
-                  className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
+                  className="inline-flex justify-center w-full
+                  rounded-md border border-transparent
+                   shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium
+                    text-white hover:bg-indigo-700
+                    focus:outline-none focus:ring-2 focus:ring-offset-2
+                    focus:ring-indigo-500 sm:text-sm"
                   onClick={() => setOpen(false)}
                 >
                   Okay
@@ -291,9 +320,16 @@ export function ClaimInfoPopup() {
   );
 }
 
-export function ClaimAirdropPopup(props) {
-  let open = props.open;
-  let setOpen = props.setOpen;
+export function ClaimAirdropPopup({
+  address,
+  claimableAmount,
+  isRedemmed,
+  expire,
+  airdropInfo,
+  airdropSigner,
+  open,
+  setOpen,
+}: props): ReactNode {
   const [claimableAmount, setClaimableAmount] = useState(props.claimableAmount);
   const [isRedeemed, setIsRedeemed] = useState(props.isRedeemed);
 
@@ -308,31 +344,31 @@ export function ClaimAirdropPopup(props) {
 
   useEffect(() => {
     setAddress(props.address);
-  }, [props.address]);
+  }, [address]);
 
   useEffect(() => {
     setOpen(props.open);
-  }, [props.open]);
+  }, [open, setOpen]);
 
   useEffect(() => {
     setClaimableAmount(props.claimableAmount);
-  }, [props.claimableAmount]);
+  }, [claimableAmount]);
 
   useEffect(() => {
     setIsRedeemed(props.isRedeemed);
-  }, [props.isRedeemed]);
+  }, [isRedeemed]);
 
   useEffect(() => {
     setExpire(props.expire);
-  }, [props.expire]);
+  }, [expire]);
 
   useEffect(() => {
     setAirdropInfo(props.airdropInfo);
-  }, [props.airdropInfo]);
+  }, [airdropInfo]);
 
   useEffect(() => {
     setAirdropSigner(props.airdropSigner);
-  }, [props.airdropSigner]);
+  }, [airdropSigner]);
 
   return (
     <Transition.Root show={props.open} as={Fragment}>
@@ -344,7 +380,10 @@ export function ClaimAirdropPopup(props) {
         open={open}
         onClose={setOpen}
       >
-        <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div
+          className="flex items-end justify-center min-h-screen
+         pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -354,12 +393,15 @@ export function ClaimAirdropPopup(props) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            <Dialog.Overlay
+              className="fixed inset-0 bg-gray-500 
+            bg-opacity-75 transition-opacity"
+            />
           </Transition.Child>
 
-          {/* This element is to trick the browser into centering the modal contents. */}
           <span
-            className="hidden sm:inline-block sm:align-middle sm:h-screen"
+            className="hidden sm:inline-block 
+          sm:align-middle sm:h-screen"
             aria-hidden="true"
           >
             &#8203;
@@ -373,47 +415,55 @@ export function ClaimAirdropPopup(props) {
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <div
+              className="inline-block align-bottom bg-white rounded-lg
+            px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform
+            transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+            >
               <div>
-                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                  <GiftIcon
-                    className="h-6 w-6 text-green-600"
-                    aria-hidden="true"
-                  />
+                <div
+                  className="mx-auto flex items-center justify-center h-12 w-12 
+                rounded-full bg-green-100"
+                >
+                  <GiftIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
                 </div>
                 <div className="mt-3 text-center sm:mt-5">
                   <Dialog.Title
                     as="h3"
-                    className="text-lg leading-6 font-medium text-gray-900"
+                    className="text-lg leading-6 
+                  font-medium text-gray-900"
                   >
-                    {isRedeemed
-                      ? "Airdrop redeemed"
-                      : claimableAmount > 0
-                      ? `You have a claim!`
-                      : "No Claim Available"}
+                    {isRedeemed ? 'Airdrop redeemed' : claimableAmount > 0 ? `You have a claim!` : 'No Claim Available'}
                   </Dialog.Title>
                   <div className="mt-8 mb-8">
                     <p className="text-xl text-gray-500">
-                      {isRedeemed ? "Claimed" : "Claimable"} Amount:{" "}
-                      <span className="border rounded-md pt-1 pb-1 pl-4 pr-4 bg-gray-100">
+                      {isRedeemed ? 'Claimed' : 'Claimable'}
+                      Amount:{' '}
+                      <span
+                        className="border rounded-md pt-1 pb-1 pl-4
+                      pr-4 bg-gray-100"
+                      >
                         {claimableAmount / Math.pow(10, 18)}
-                      </span>{" "}
+                      </span>{' '}
                       $SWEEP 🧹
                     </p>
                   </div>
                   {!isRedeemed && expire ? (
-                    <div className="mt-2 mb-2 border rounded-md py-6 bg-gray-100">
+                    <div
+                      className="mt-2 mb-2 border rounded-md 
+                    py-6 bg-gray-100"
+                    >
                       <p className="text-base text-gray-500">
-                        Expires:{" "}
-                        {expire.toLocaleDateString("en-gb", {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                          hour: "numeric",
-                          minute: "numeric",
-                          timeZone: "utc",
-                          timeZoneName: "short"
+                        Expires:{' '}
+                        {expire.toLocaleDateString('en-gb', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: 'numeric',
+                          timeZone: 'utc',
+                          timeZoneName: 'short',
                         })}
                       </p>
                     </div>
@@ -425,7 +475,11 @@ export function ClaimAirdropPopup(props) {
                 <div className="mt-5 sm:mt-6">
                   <button
                     type="button"
-                    className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
+                    className="inline-flex justify-center w-full rounded-md
+                    border border-transparent shadow-sm px-4 py-2 bg-indigo-600
+                    text-base font-medium text-white hover:bg-indigo-700
+                    focus:outline-none focus:ring-2 focus:ring-offset-2
+                     focus:ring-indigo-500 sm:text-sm"
                     onClick={() => setOpen(false)}
                   >
                     Okay
@@ -434,17 +488,19 @@ export function ClaimAirdropPopup(props) {
               ) : null}
 
               {!isRedeemed && claimableAmount > 0 ? (
-                <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                <div
+                  className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 
+                sm:gap-3 sm:grid-flow-row-dense"
+                >
                   <button
                     type="button"
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
+                    className="w-full inline-flex justify-center rounded-md
+                    border border-transparent shadow-sm px-4 py-2 bg-indigo-600
+                    text-base font-medium text-white hover:bg-indigo-700
+                    focus:outline-none focus:ring-2 focus:ring-offset-2
+                    focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
                     onClick={() => {
-                      redeem(
-                        address,
-                        claimableAmount,
-                        airdropInfo,
-                        airdropSigner
-                      );
+                      redeem(address, claimableAmount, airdropInfo, airdropSigner);
                       setOpen(false);
                     }}
                   >
@@ -452,7 +508,12 @@ export function ClaimAirdropPopup(props) {
                   </button>
                   <button
                     type="button"
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+                    className="mt-3 w-full inline-flex justify-center
+                    rounded-md border border-gray-300 shadow-sm px-4
+                    py-2 bg-white text-base font-medium text-gray-700
+                    hover:bg-gray-50 focus:outline-none focus:ring-2
+                    focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0
+                    sm:col-start-1 sm:text-sm"
                     onClick={() => setOpen(false)}
                     ref={cancelButtonRef}
                   >

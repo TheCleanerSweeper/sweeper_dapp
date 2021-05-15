@@ -1,8 +1,8 @@
-import { Fragment } from "react";
-import { Popover } from "@headlessui/react";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
-import logo from "../images/logo.svg";
+import React from 'react';
+import { Popover } from '@headlessui/react';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import logo from '../images/logo.svg';
 
 const SweepButton = styled.button`
 	color: white;
@@ -34,7 +34,7 @@ const SweepButton = styled.button`
     }
 `;
 
-const NavBar = () => {
+const NavBar: React.FunctionComponent = () => {
   return (
     <nav>
       <Popover className="relative bg-white">
@@ -44,13 +44,11 @@ const NavBar = () => {
               <div className="flex justify-start lg:w-0 lg:flex-1">
                 <a href="/" className="flex">
                   <img className="h-16 w-auto sm:h-16" src={logo} alt="" />
-                  <div className="w-auto flex items-center justify-center pl-4 text-3xl">
-                    SweeperDAO
-                  </div>
+                  <div className="w-auto flex items-center justify-center pl-4 text-3xl">SweeperDAO</div>
                 </a>
               </div>
               <div className=" md:flex items-center justify-end md:flex-1 lg:w-0">
-                <Link to={"/app/claim"}>
+                <Link to={'/app/claim'}>
                   <SweepButton className="bg-red">Sweep</SweepButton>
                 </Link>
               </div>

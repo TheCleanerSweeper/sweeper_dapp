@@ -1,5 +1,5 @@
-import React from "react";
-import styled, { keyframes } from "styled-components";
+import React from 'react';
+import styled, { keyframes } from 'styled-components';
 
 const Svg = styled.svg`
   flex-shrink: 0;
@@ -71,8 +71,7 @@ const Bunny = styled.div`
   animation-name: ${bunnyFall};
   animation-duration: ${({ duration }) => `${duration}s`};
   animation-timing-function: linear;
-  animation-iteration-count: ${({ iterations }) =>
-    Number.isFinite(iterations) ? String(iterations) : "infinite"};
+  animation-iteration-count: ${({ iterations }) => (Number.isFinite(iterations) ? String(iterations) : 'infinite')};
   animation-play-state: running;
   &:nth-child(5n + 5) {
     animation-delay: ${({ duration }) => `${(duration / 10) * 1.3}s`};
@@ -97,19 +96,9 @@ const Bunny = styled.div`
   }
 `;
 
-const FallingBunnies = ({
-  count = 30,
-  size = 32,
-  iterations = Infinity,
-  duration = 10
-}) => {
+const FallingBunnies = ({ count = 30, size = 32, iterations = Infinity, duration = 10 }) => {
   const bunnies = [...Array(count)].map((_, index) => (
-    <Bunny
-      key={String(index)}
-      position={Math.random() * 100}
-      iterations={iterations}
-      duration={duration}
-    >
+    <Bunny key={String(index)} position={Math.random() * 100} iterations={iterations} duration={duration}>
       <BunnyIcon width={size} height={size} />
     </Bunny>
   ));
