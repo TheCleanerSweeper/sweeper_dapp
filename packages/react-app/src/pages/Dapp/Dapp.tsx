@@ -2,19 +2,27 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Route, Switch } from 'react-router-dom';
 import { addresses, abis } from '@project/contracts';
-import { MenuIcon, XIcon, GiftIcon } from '@heroicons/react/outline';
+import { MenuIcon, XIcon, GiftIcon, HomeIcon } from '@heroicons/react/outline';
 import styled from 'styled-components';
 import EthIcon from 'eth-icon';
 import { ethers } from 'ethers';
 
 import logo from '../../images/logo.svg';
 import Claim from '../../components/Dapp/Claim';
+import Dashboard from '../../components/Dapp/Dashboard';
 import Popup from '../../components/Dapp/Popup';
 
 import { shortenAddress } from '../../utils/index';
 
 const navigation = [
+  { name: 'Dashboard', href: '#/app/dashboard', icon: HomeIcon, current: true },
   { name: 'Claim', href: '#/app/claim', icon: GiftIcon, current: false },
+  // {
+  //   name: "Swap",
+  //   href: "#/app/burn",
+  //   icon: SwitchHorizontalIcon,
+  //   current: false,
+  // },
   // {
   //   name: "$SWEEP",
   //   href: "#/app/burn",
@@ -45,6 +53,7 @@ const Dapp: React.FC = () => {
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>();
   const [sweeperBalance, setSweeperBalance] = useState('');
   const [hasMetamask, setHasMetamask] = useState<boolean>();
+  const [sweeperContract, setsweeperContract] = useState<ethers.Contract>();
   const [correctChain, setCorrectChain] = useState(false);
 
   if (window.ethereum) {
@@ -94,10 +103,11 @@ const Dapp: React.FC = () => {
 
     const contractAddress = addresses.sweeperdaoBSCMainnet;
     const abi = abis.sweeperdao;
-    const airdropContract = new ethers.Contract(contractAddress, abi, pvd);
-    const balance = await airdropContract.balanceOf(addr);
+    const contract = new ethers.Contract(contractAddress, abi, provider);
+    const balance = await contract.balanceOf(addr);
     const formattedBalance = ethers.utils.formatUnits(balance.toString(), 18);
     setSweeperBalance(formattedBalance);
+    setsweeperContract(contract);
   };
 
   useEffect(() => {
@@ -314,28 +324,32 @@ const Dapp: React.FC = () => {
         </div>
 
         <main
-          className="flex-1 relative z-0 overflow-y-auto focus:outline-none bg-gradient-to-br
-          from-gray-700 via-gray-600 to-gray-700"
+          className="flex-1 relative z-0 overflow-y-auto focus:outline-none
+        bg-gradient-to-br  from-gray-700 via-gray-600 to-gray-700"
         >
-          <div className="py-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-              <div className="py-4">
-                <Switch>
-                  <Route
-                    exact
-                    path="/app/claim"
-                    render={(props) => (
-                      <Claim
-                        address={address}
-                        addEthereum={addEthereum}
-                        provider={provider}
-                        signer={signer}
-                        sweeperBalance={sweeperBalance}
-                      />
-                    )}
-                  />
-                </Switch>
-              </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <div className="py-2">
+              <Switch>
+                <Route
+                  path="/app/dashboard"
+                  render={(props) => (
+                    <Dashboard sweeperContract={sweeperContract} provider={provider} addEthereum={addEthereum} />
+                  )}
+                />
+                <Route
+                  exact
+                  path="/app/claim"
+                  render={(props) => (
+                    <Claim
+                      address={address}
+                      addEthereum={addEthereum}
+                      provider={provider}
+                      signer={signer}
+                      sweeperBalance={sweeperBalance}
+                    />
+                  )}
+                />
+              </Switch>
             </div>
           </div>
         </main>
