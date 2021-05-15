@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
 import './index.css';
-import App from './App';
 import { HashRouter } from 'react-router-dom';
+import App from './App';
 
 // You should replace this url with your own and put it into a .env file
 // See all subgraphs: https://thegraph.com/explorer/

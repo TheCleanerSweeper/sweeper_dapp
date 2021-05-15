@@ -34,30 +34,28 @@ const SweepButton = styled.button`
     }
 `;
 
-const NavBar: React.FunctionComponent = () => {
-  return (
-    <nav>
-      <Popover className="relative bg-white">
-        <>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="flex justify-between items-center border-b-2 border-gray-100 py-6 md:justify-start md:space-x-10">
-              <div className="flex justify-start lg:w-0 lg:flex-1">
-                <a href="/" className="flex">
-                  <img className="h-16 w-auto sm:h-16" src={logo} alt="" />
-                  <div className="w-auto flex items-center justify-center pl-4 text-3xl">SweeperDAO</div>
-                </a>
-              </div>
-              <div className=" md:flex items-center justify-end md:flex-1 lg:w-0">
-                <Link to={'/app/claim'}>
-                  <SweepButton className="bg-red">Sweep</SweepButton>
-                </Link>
-              </div>
+const NavBar: React.FunctionComponent = () => (
+  <nav>
+    <Popover className="relative bg-white">
+      <>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex justify-between items-center border-b-2 border-gray-100 py-6 md:justify-start md:space-x-10">
+            <div className="flex justify-start lg:w-0 lg:flex-1">
+              <a href="/" className="flex">
+                <img className="h-16 w-auto sm:h-16" src={logo} alt="" />
+                <div className="w-auto flex items-center justify-center pl-4 text-3xl">SweeperDAO</div>
+              </a>
+            </div>
+            <div className=" md:flex items-center justify-end md:flex-1 lg:w-0">
+              <Link to="/app/claim">
+                <SweepButton className="bg-red">Sweep</SweepButton>
+              </Link>
             </div>
           </div>
-        </>
-      </Popover>
-    </nav>
-  );
-};
+        </div>
+      </>
+    </Popover>
+  </nav>
+);
 
 export default NavBar;

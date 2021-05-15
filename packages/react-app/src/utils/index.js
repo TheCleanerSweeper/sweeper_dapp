@@ -1,3 +1,1 @@
-export const shortenAddress = address => {
-  return address.slice(0, 5) + '..' + address.slice(-5);
-};
+export const shortenAddress = (address) => `${address.slice(0, 5)}..${address.slice(-5)}`;

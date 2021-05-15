@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import data from '../data.json';
 import goerlidata from '../goerlidata.json';
 
-export const getAirdropInfo = address => {
+export const getAirdropInfo = (address) => {
   // const fs = require("fs");
   let airdropData = data;
 
@@ -13,20 +13,20 @@ export const getAirdropInfo = address => {
   return airdropData;
 };
 
-export const getGoerliAirdropInfo = async address => {
+export const getGoerliAirdropInfo = async (address) => {
   const fs = require('fs');
 
-  let rawdata = fs.readFileSync('../data.json');
-  let airdropData = JSON.parse(rawdata);
+  const rawdata = fs.readFileSync('../data.json');
+  const airdropData = JSON.parse(rawdata);
   return airdropData;
 };
 
-export const getClaimableAmount = airdropInfo => {
+export const getClaimableAmount = (airdropInfo) => {
   let format = '0';
   if (airdropInfo) {
-    const amount = airdropInfo.amount;
+    const { amount } = airdropInfo;
     // const toDisplay = amount ? Number(amount) / Math.pow(10, 18) : "0";
-    const toDisplay = amount ? amount : '0';
+    const toDisplay = amount || '0';
     format = toDisplay.toString();
   }
   // setClaimable(format);

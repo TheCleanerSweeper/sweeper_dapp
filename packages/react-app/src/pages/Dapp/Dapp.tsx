@@ -1,5 +1,5 @@
-import React from 'react';
-import { Fragment, useState, useEffect, ReactNode } from 'react';
+import React, { Fragment, useState, useEffect, ReactNode } from 'react';
+
 import { Dialog, Transition } from '@headlessui/react';
 import { Router, Route, Switch, useLocation } from 'react-router-dom';
 import { addresses, abis } from '@project/contracts';
@@ -23,16 +23,16 @@ import styled from 'styled-components';
 
 import { ethers } from 'ethers';
 
+import EthIcon from 'eth-icon';
+import { resultKeyNameFromField } from 'apollo-utilities';
 import logo from '../../images/logo.svg';
 
-import EthIcon from 'eth-icon';
 import Dashboard from '../../components/Dapp/Dashboard';
 import Claim from '../../components/Dapp/Claim';
 import Burn from '../../components/Dapp/Burn';
 import Wallet from '../../components/Dapp/Wallet';
 
 import { shortenAddress } from '../../utils/index';
-import { resultKeyNameFromField } from 'apollo-utilities';
 
 const navigation = [
   // { name: "Dashboard", href: "#/app/dashboard", icon: HomeIcon, current: true },
@@ -90,9 +90,9 @@ export default function Dapp(): ReactNode {
   const [sweeperBalance, setSweeperBalance] = useState('');
   const [hasMetamask, setHasMetamask] = useState();
 
-  let path = useLocation().pathname;
+  const path = useLocation().pathname;
   if (window.ethereum) {
-    window.ethereum.on('accountsChanged', function(accounts: [string]) {
+    window.ethereum.on('accountsChanged', (accounts: [string]) => {
       // Time to reload your interface with accounts[0]!
       setAddress(accounts[0]);
     });
@@ -105,7 +105,7 @@ export default function Dapp(): ReactNode {
       return;
     }
     setHasMetamask(true);
-    var accountsOnEnable = await window.ethereum.request({
+    const accountsOnEnable = await window.ethereum.request({
       method: 'eth_requestAccounts',
     });
 
@@ -203,7 +203,7 @@ export default function Dapp(): ReactNode {
                   </a>
                 </div>
                 <nav className="mt-5 px-2 space-y-1">
-                  {navigation.map(item => (
+                  {navigation.map((item) => (
                     <a
                       key={item.name}
                       href={item.href}
@@ -265,7 +265,7 @@ export default function Dapp(): ReactNode {
                 </a>
               </div>
               <nav className="mt-5 flex-1 px-2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-800 space-y-1">
-                {navigation.map(item => (
+                {navigation.map((item) => (
                   <a
                     key={item.name}
                     href={item.href}
@@ -340,7 +340,7 @@ export default function Dapp(): ReactNode {
                   <Route
                     exact
                     path="/app/claim"
-                    render={props => (
+                    render={(props) => (
                       <Claim
                         address={address}
                         addEthereum={addEthereum}

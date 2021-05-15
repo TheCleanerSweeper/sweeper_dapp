@@ -126,13 +126,15 @@ export function ClaimModal({
       {balance ? (
         <div className="flex sm:p-6  text-2xl  justify-center">
           <div flex w-full mb-36>
-            Balance:{' '}
+            Balance:
+            {' '}
             <span
               className="rounded-md border border-gray-300 pt-2
              pb-2 pl-4 pr-4 bg-gray-100"
             >
               {balance}
-            </span>{' '}
+            </span>
+            {' '}
             🧹$SWEEP🧹
           </div>
         </div>
@@ -239,7 +241,7 @@ export function ClaimInfoPopup() {
         onClose={setOpen}
       >
         <div
-          className="flex items-end justify-center min-h-screen 
+          className="flex items-end justify-center min-h-screen
         pt-4 px-4 pb-20 text-center sm:block sm:p-0"
         >
           <Transition.Child
@@ -252,13 +254,13 @@ export function ClaimInfoPopup() {
             leaveTo="opacity-0"
           >
             <Dialog.Overlay
-              className="fixed inset-0 bg-gray-500 
+              className="fixed inset-0 bg-gray-500
             bg-opacity-75 transition-opacity"
             />
           </Transition.Child>
 
           <span
-            className="hidden sm:inline-block sm:align-middle 
+            className="hidden sm:inline-block sm:align-middle
           sm:h-screen"
             aria-hidden="true"
           >
@@ -274,14 +276,14 @@ export function ClaimInfoPopup() {
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div
-              className="inline-block align-bottom 
-            bg-white rounded-lg px-4 pt-5 pb-4 text-left 
-            overflow-hidden shadow-xl transform transition-all 
+              className="inline-block align-bottom
+            bg-white rounded-lg px-4 pt-5 pb-4 text-left
+            overflow-hidden shadow-xl transform transition-all
             sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
             >
               <div>
                 <div
-                  className="mx-auto flex items-center 
+                  className="mx-auto flex items-center
                 justify-center h-12 w-12 rounded-full bg-green-100"
                 >
                   <GiftIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
@@ -394,13 +396,13 @@ export function ClaimAirdropPopup({
             leaveTo="opacity-0"
           >
             <Dialog.Overlay
-              className="fixed inset-0 bg-gray-500 
+              className="fixed inset-0 bg-gray-500
             bg-opacity-75 transition-opacity"
             />
           </Transition.Child>
 
           <span
-            className="hidden sm:inline-block 
+            className="hidden sm:inline-block
           sm:align-middle sm:h-screen"
             aria-hidden="true"
           >
@@ -422,7 +424,7 @@ export function ClaimAirdropPopup({
             >
               <div>
                 <div
-                  className="mx-auto flex items-center justify-center h-12 w-12 
+                  className="mx-auto flex items-center justify-center h-12 w-12
                 rounded-full bg-green-100"
                 >
                   <GiftIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
@@ -430,31 +432,34 @@ export function ClaimAirdropPopup({
                 <div className="mt-3 text-center sm:mt-5">
                   <Dialog.Title
                     as="h3"
-                    className="text-lg leading-6 
+                    className="text-lg leading-6
                   font-medium text-gray-900"
                   >
-                    {isRedeemed ? 'Airdrop redeemed' : claimableAmount > 0 ? `You have a claim!` : 'No Claim Available'}
+                    {isRedeemed ? 'Airdrop redeemed' : claimableAmount > 0 ? 'You have a claim!' : 'No Claim Available'}
                   </Dialog.Title>
                   <div className="mt-8 mb-8">
                     <p className="text-xl text-gray-500">
                       {isRedeemed ? 'Claimed' : 'Claimable'}
-                      Amount:{' '}
+                      Amount:
+                      {' '}
                       <span
                         className="border rounded-md pt-1 pb-1 pl-4
                       pr-4 bg-gray-100"
                       >
                         {claimableAmount / Math.pow(10, 18)}
-                      </span>{' '}
+                      </span>
+                      {' '}
                       $SWEEP 🧹
                     </p>
                   </div>
                   {!isRedeemed && expire ? (
                     <div
-                      className="mt-2 mb-2 border rounded-md 
+                      className="mt-2 mb-2 border rounded-md
                     py-6 bg-gray-100"
                     >
                       <p className="text-base text-gray-500">
-                        Expires:{' '}
+                        Expires:
+                        {' '}
                         {expire.toLocaleDateString('en-gb', {
                           weekday: 'long',
                           year: 'numeric',
@@ -489,7 +494,7 @@ export function ClaimAirdropPopup({
 
               {!isRedeemed && claimableAmount > 0 ? (
                 <div
-                  className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 
+                  className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2
                 sm:gap-3 sm:grid-flow-row-dense"
                 >
                   <button
