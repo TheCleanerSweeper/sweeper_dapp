@@ -17,8 +17,6 @@ line-height: 1.5;
 border-radius: 0.3125rem;
 transition: all 0.2s ease-in-out;
 &: hover {
-    // transform: scale(1.01);
-    // position:relative;
     transform: translate(10px)
     box-shadow: 0.5px 0.5px 15px #e6007a;
     background-color: rgba(230, 0, 122, 0.6);

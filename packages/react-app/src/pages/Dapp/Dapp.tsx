@@ -12,6 +12,7 @@ import logo from '../../images/logo.svg';
 import Claim from '../../components/Dapp/Claim';
 import Dashboard from '../../components/Dapp/Dashboard';
 import Popup from '../../components/Dapp/Popup';
+import WalletButton from '../../components/Dapp/walletButton';
 
 import { shortenAddress } from '../../utils/index';
 
@@ -41,10 +42,6 @@ const AddressBox = styled.div`
   padding-bottom: 10%;
   padding-right: 10%;
   padding-left: 10%;
-  &: hover {
-    background-color: #374151;
-    cursor: pointer;
-  }
 `;
 
 const Dapp: React.FC = () => {
@@ -58,18 +55,16 @@ const Dapp: React.FC = () => {
   const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal();
 
   async function addEthereum(): Promise<void> {
-    loadWeb3Modal();
     if (!provider) {
       return;
     }
+
     const network = await provider.getNetwork();
     if (network.chainId !== 56 && network.chainId !== 5) {
       setCorrectChain(true);
       return;
     }
-    // The Metamask plugin also allows signing transactions to
-    // send ether and pay to change state within the blockchain.
-    // For this, you need the account signer...
+
     const snr = provider.getSigner();
     setSigner(snr);
 
@@ -84,8 +79,10 @@ const Dapp: React.FC = () => {
     const abi = abis.sweeperdao;
     const contract = new ethers.Contract(contractAddress, abi, provider);
     const balance = await contract.balanceOf(addr);
-    const formattedBalance = ethers.utils.formatUnits(balance.toString(), 18);
-    setSweeperBalance(formattedBalance);
+    const formattedBalance = ethers.utils.formatEther(balance);
+    const fixedTS = Number(formattedBalance).toFixed(5);
+    const nice = ethers.utils.commify(fixedTS);
+    setSweeperBalance(nice);
     setsweeperContract(contract);
   };
 
@@ -94,6 +91,12 @@ const Dapp: React.FC = () => {
       getSweepBalance(provider, address);
     }
   }, [provider, address]);
+
+  useEffect(() => {
+    if (provider) {
+      addEthereum();
+    }
+  }, [provider]);
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
@@ -258,33 +261,38 @@ const Dapp: React.FC = () => {
                 ))}
               </nav>
             </div>
-            <AddressBox className=" bg-gray-800 p-4" onClick={() => addEthereum()}>
-              <div className="flex items-center">
-                <div>
-                  <EthIcon
-                    className="inline-block h-9 w-9 rounded-full"
-                    // Address to draw
-                    address={address}
-                    // scale * 8 pixel image size
-                    scale={16}
-                    // <img> props
-                    style={{
-                      background: 'red',
-                    }}
-                  />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-white">{address ? shortenAddress(address) : 'None Set'}</p>
-                  <p className="text-xs font-medium text-gray-300 group-hover:text-gray-200">
-                    {!address ? 'Connect Wallet' : null}
-                  </p>
-                </div>
-              </div>
-              <div className="flex mt-5 items-center justify-center">
-                <p className="text-xs font-medium text-white">
-                  {sweeperBalance ? `${sweeperBalance} $SWEEP 🧹` : null}
-                </p>
-              </div>
+            <AddressBox className="bg-gray-800">
+              {provider ? (
+                <>
+                  <div className="flex items-center">
+                    <div>
+                      <EthIcon
+                        className="inline-block h-9 w-9 rounded-full"
+                        // Address to draw
+                        address={address}
+                        // scale * 8 pixel image size
+                        scale={16}
+                        // <img> props
+                        style={{
+                          background: 'red',
+                        }}
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-white">{address ? shortenAddress(address) : 'None Set'}</p>
+                      <p className="text-xs font-medium text-gray-300 group-hover:text-gray-200">
+                        {!address ? 'Connect Wallet' : null}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <p className="text-xs font-medium text-white">
+                      {sweeperBalance ? `${sweeperBalance} $SWEEP 🧹` : null}
+                    </p>
+                  </div>
+                </>
+              ) : null}
+              <WalletButton provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal} />
             </AddressBox>
           </div>
         </div>
@@ -311,21 +319,13 @@ const Dapp: React.FC = () => {
               <Switch>
                 <Route
                   path="/app/dashboard"
-                  render={(props) => (
-                    <Dashboard sweeperContract={sweeperContract} provider={provider} addEthereum={addEthereum} />
-                  )}
+                  render={(props) => <Dashboard sweeperContract={sweeperContract} provider={provider} />}
                 />
                 <Route
                   exact
                   path="/app/claim"
                   render={(props) => (
-                    <Claim
-                      address={address}
-                      addEthereum={addEthereum}
-                      provider={provider}
-                      signer={signer}
-                      sweeperBalance={sweeperBalance}
-                    />
+                    <Claim address={address} provider={provider} signer={signer} sweeperBalance={sweeperBalance} />
                   )}
                 />
               </Switch>

@@ -57,7 +57,6 @@ const checkClaim = async (
 
 interface ClaimModalProps {
   address: string;
-  addEthereum: any;
   provider: any;
   signer: any;
   balance: any;
@@ -71,7 +70,6 @@ interface ClaimModalProps {
 
 const ClaimModal: React.FunctionComponent<ClaimModalProps> = ({
   address,
-  addEthereum,
   provider,
   signer,
   balance,
@@ -107,20 +105,6 @@ const ClaimModal: React.FunctionComponent<ClaimModalProps> = ({
         />
       ) : null}
       {address ? `Address: ${address}` : 'Wallet Not Connected'}
-      {!address ? (
-        <button
-          onClick={() => addEthereum()}
-          type="button"
-          className="
-              inline-flex ml-4 justify-center rounded-md border
-              border-gray-300 shadow-sm px-4 py-2 bg-white text-base
-              font-medium text-gray-700 hover:bg-gray-50 focus:outline-none
-              focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0
-              sm:col-start-1 sm:text-sm"
-        >
-          Connect Wallet
-        </button>
-      ) : null}
     </div>
 
     {balance ? (
@@ -147,7 +131,6 @@ const ClaimModal: React.FunctionComponent<ClaimModalProps> = ({
         onClick={() => {
           checkClaim(
             address,
-            // "0x949f435a2508f397c42b5b85993132de9600a3b9",
             provider,
             signer,
             setClaimableAmount,
@@ -158,7 +141,6 @@ const ClaimModal: React.FunctionComponent<ClaimModalProps> = ({
             setAirdropSigner,
           );
         }}
-        // ref={cancelButtonRef}
       >
         Check Eligibility
       </button>
@@ -392,13 +374,12 @@ const ClaimAirdropPopup: React.FC<AirdropProps> = ({
 
 interface ClaimProps {
   address: any;
-  addEthereum: any;
   provider: any;
   signer: any;
   sweeperBalance: any;
 }
 
-const Claim: React.FC<ClaimProps> = ({ address, addEthereum, provider, signer, sweeperBalance }: ClaimProps) => {
+const Claim: React.FC<ClaimProps> = ({ address, provider, signer, sweeperBalance }: ClaimProps) => {
   const [balance, setBalance] = useState(sweeperBalance);
 
   const [showPopup, setShowPopup] = useState(false);
@@ -422,7 +403,6 @@ const Claim: React.FC<ClaimProps> = ({ address, addEthereum, provider, signer, s
       <ClaimModal
         address={address}
         balance={balance}
-        addEthereum={addEthereum}
         provider={provider}
         signer={signer}
         setShowPopup={setShowPopup}

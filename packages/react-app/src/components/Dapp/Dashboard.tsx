@@ -4,6 +4,9 @@ import { ChartBarIcon, CurrencyYenIcon, FireIcon } from '@heroicons/react/outlin
 import CountUp from 'react-countup';
 
 const getData = async (sweeperContract, provider, setsupplyInfo, setburnInfo): Promise<void> => {
+  if (!provider) {
+    return;
+  }
   const totalSupply = await sweeperContract.totalSupply();
   const ts = ethers.utils.formatEther(totalSupply);
   const fixedTS = Number(ts).toFixed(3);
@@ -31,10 +34,9 @@ const getData = async (sweeperContract, provider, setsupplyInfo, setburnInfo): P
 interface DashBoardProps {
   sweeperContract: ethers.Contract;
   provider: ethers.providers.Web3Provider;
-  addEthereum: any;
 }
 
-const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract, provider, addEthereum }: DashBoardProps) => {
+const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract, provider }: DashBoardProps) => {
   const [supplyInfo, setsupplyInfo] = useState('');
   const [burnInfo, setburnInfo] = useState();
 
@@ -89,22 +91,7 @@ const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract, provider, addEth
               </div>
             </div>
           </>
-        ) : (
-          <div className="mr-3 mt-10 overflow-hidden divide-y justify-center text-center text-3xl">
-            <div className="h-full px-4 py-3 sm:px-6 text-white">
-              <button
-                onClick={() => addEthereum()}
-                type="button"
-                className=" inline-flex ml-4 justify-center rounded-md
-                border border-gray-300 shadow-sm px-4 py-2 bg-white text-base
-                font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2
-                focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
-              >
-                Connect wallet to see stats
-              </button>
-            </div>
-          </div>
-        )}
+        ) : null}
       </div>
     </>
   );
