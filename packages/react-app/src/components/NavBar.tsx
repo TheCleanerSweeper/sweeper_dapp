@@ -40,7 +40,7 @@ const NavBar: React.FunctionComponent = () => (
               </a>
             </div>
             <div className=" md:flex items-center justify-end md:flex-1 lg:w-0">
-              <Link to="/app/claim">
+              <Link to="/app/dashboard">
                 <SweepButton className="bg-red">Sweep</SweepButton>
               </Link>
             </div>

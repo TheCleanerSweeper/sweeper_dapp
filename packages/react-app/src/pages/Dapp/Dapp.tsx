@@ -47,10 +47,6 @@ const Dapp: React.FC = () => {
   const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal();
 
   async function addEthereum(): Promise<void> {
-    if (!provider) {
-      return;
-    }
-
     const network = await provider.getNetwork();
     if (network.chainId !== 56 && network.chainId !== 5) {
       setCorrectChain(true);
@@ -83,11 +79,9 @@ const Dapp: React.FC = () => {
     }
   }, [provider, address]);
 
-  useEffect(() => {
-    if (provider) {
-      addEthereum();
-    }
-  }, [provider]);
+  if (provider) {
+    addEthereum();
+  }
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
