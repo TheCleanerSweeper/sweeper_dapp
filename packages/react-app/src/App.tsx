@@ -8,7 +8,7 @@ import Dapp from './pages/Dapp/Dapp';
 
 function App(): React.ReactNode {
   return (
-    <body className="flex flex-col">
+    <div className="flex flex-col">
       <Route path="/" component={NavBar} exact />
       <Switch>
         <Route path="/" component={Landing} exact />
@@ -16,7 +16,7 @@ function App(): React.ReactNode {
         <Route path="/app/*" component={Dapp} exact />
       </Switch>
       <Route path="/" component={Footer} exact />
-    </body>
+    </div>
   );
 }
 
