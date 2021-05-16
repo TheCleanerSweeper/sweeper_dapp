@@ -3,6 +3,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { GiftIcon } from "@heroicons/react/outline";
 import EthIcon from "eth-icon";
 import { useWeb3React } from "@web3-react/core";
+import { ethers } from "ethers";
 import { addresses, abis } from "@project/contracts";
 
 import Popup from "./Popup";
