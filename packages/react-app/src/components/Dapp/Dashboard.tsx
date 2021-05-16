@@ -33,6 +33,7 @@ interface DashBoardProps {
   provider: ethers.providers.Web3Provider;
   addEthereum: any;
 }
+
 const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract, provider, addEthereum }: DashBoardProps) => {
   const [supplyInfo, setsupplyInfo] = useState('');
   const [burnInfo, setburnInfo] = useState();

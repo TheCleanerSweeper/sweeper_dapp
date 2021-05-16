@@ -8,23 +8,37 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 // You can get a key for free at https://infura.io/register
 const INFURA_ID = 'INVALID_INFURA_KEY';
 
-const NETWORK_NAME = 'mainnet';
+const RPC = {
+  1: 'https://bsc-dataseed.binance.org/',
+  2: 'https://bsc-dataseed1.defibit.io/',
+  3: 'https://bsc-dataseed1.ninicoin.io/',
+  4: 'https://bsc-dataseed2.defibit.io/',
+  5: 'https://bsc-dataseed3.defibit.io/',
+  6: 'https://bsc-dataseed4.defibit.io/',
+  7: 'https://bsc-dataseed2.ninicoin.io/',
+  8: 'https://bsc-dataseed3.ninicoin.io/',
+  9: 'https://bsc-dataseed4.ninicoin.io/',
+  10: 'https://bsc-dataseed1.binance.org/',
+  11: 'https://bsc-dataseed2.binance.org/',
+  12: 'https://bsc-dataseed3.binance.org/',
+  13: 'https://bsc-dataseed4.binance.org/',
+};
 
-function useWeb3Modal(config = {}) {
-  const [provider, setProvider] = useState();
-  const [autoLoaded, setAutoLoaded] = useState(false);
-  const { autoLoad = true, infuraId = INFURA_ID, NETWORK = NETWORK_NAME } = config;
+function useWeb3Modal(config: any = {}): [Web3Provider, () => Promise<void>, () => Promise<void>] {
+  const [provider, setProvider] = useState<Web3Provider>();
+  const [autoLoaded, setAutoLoaded] = useState<boolean>(false);
+  const { autoLoad = true } = config;
 
   // Web3Modal also supports many other wallets.
   // You can see other options at https://github.com/Web3Modal/web3modal
   const web3Modal = new Web3Modal({
-    network: NETWORK,
+    // network: NETWORK,
     cacheProvider: true,
     providerOptions: {
       walletconnect: {
         package: WalletConnectProvider,
         options: {
-          infuraId,
+          RPC,
         },
       },
     },

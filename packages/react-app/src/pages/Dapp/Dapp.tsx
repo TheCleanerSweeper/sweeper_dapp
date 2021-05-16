@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import EthIcon from 'eth-icon';
 import { ethers } from 'ethers';
 
+import useWeb3Modal from '../../hooks/useWeb3Modal';
 import logo from '../../images/logo.svg';
 import Claim from '../../components/Dapp/Claim';
 import Dashboard from '../../components/Dapp/Dashboard';
@@ -49,41 +50,19 @@ const AddressBox = styled.div`
 const Dapp: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [address, setAddress] = useState('');
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider>();
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>();
   const [sweeperBalance, setSweeperBalance] = useState('');
-  const [hasMetamask, setHasMetamask] = useState<boolean>();
   const [sweeperContract, setsweeperContract] = useState<ethers.Contract>();
   const [correctChain, setCorrectChain] = useState(false);
 
-  if (window.ethereum) {
-    window.ethereum.on('accountsChanged', (accounts: [string]) => {
-      // Time to reload your interface with accounts[0]!
-      setAddress(accounts[0]);
-    });
-  }
+  const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal();
 
   async function addEthereum(): Promise<void> {
-    if (!window.ethereum) {
-      // todo handle no metamask state
-      setHasMetamask(false);
+    loadWeb3Modal();
+    if (!provider) {
       return;
     }
-    setHasMetamask(true);
-    await window.ethereum.request({
-      method: 'eth_requestAccounts',
-    });
-
-    if (!window.ethereum) {
-      return;
-    }
-    await window.ethereum.enable();
-    // A Web3Provider wraps a standard Web3 provider, which is
-    // what Metamask injects as window.ethereum into each page
-    const provider2 = new ethers.providers.Web3Provider(window.ethereum);
-    setProvider(provider2);
-
-    const network = await provider2.getNetwork();
+    const network = await provider.getNetwork();
     if (network.chainId !== 56 && network.chainId !== 5) {
       setCorrectChain(true);
       return;
@@ -91,11 +70,11 @@ const Dapp: React.FC = () => {
     // The Metamask plugin also allows signing transactions to
     // send ether and pay to change state within the blockchain.
     // For this, you need the account signer...
-    const signer2 = provider2.getSigner();
-    setSigner(signer2);
+    const snr = provider.getSigner();
+    setSigner(snr);
 
-    const address2 = window.ethereum.selectedAddress;
-    setAddress(address2);
+    const addr = await snr.getAddress();
+    setAddress(addr);
   }
 
   const getSweepBalance = async (pvd: ethers.providers.Web3Provider, addr: string): Promise<void> => {
