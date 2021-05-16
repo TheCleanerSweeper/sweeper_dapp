@@ -3,7 +3,6 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Route, Switch } from 'react-router-dom';
 import { addresses, abis } from '@project/contracts';
 import { MenuIcon, XIcon, GiftIcon, HomeIcon } from '@heroicons/react/outline';
-import styled from 'styled-components';
 import EthIcon from 'eth-icon';
 import { ethers } from 'ethers';
 
@@ -14,7 +13,7 @@ import Dashboard from '../../components/Dapp/Dashboard';
 import Popup from '../../components/Dapp/Popup';
 import WalletButton from '../../components/Dapp/walletButton';
 
-import { shortenAddress } from '../../utils/index';
+import { shortenAddress, formatAmount } from '../../utils/index';
 
 const navigation = [
   { name: 'Dashboard', href: '#/app/dashboard', icon: HomeIcon, current: true },
@@ -36,13 +35,6 @@ const navigation = [
 function classNames(...classes): string {
   return classes.filter(Boolean).join(' ');
 }
-
-const AddressBox = styled.div`
-  padding-top: 10%;
-  padding-bottom: 10%;
-  padding-right: 10%;
-  padding-left: 10%;
-`;
 
 const Dapp: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -79,9 +71,8 @@ const Dapp: React.FC = () => {
     const abi = abis.sweeperdao;
     const contract = new ethers.Contract(contractAddress, abi, provider);
     const balance = await contract.balanceOf(addr);
-    const formattedBalance = ethers.utils.formatEther(balance);
-    const fixedTS = Number(formattedBalance).toFixed(5);
-    const nice = ethers.utils.commify(fixedTS);
+    const nice = formatAmount(balance);
+
     setSweeperBalance(nice);
     setsweeperContract(contract);
   };
@@ -261,39 +252,32 @@ const Dapp: React.FC = () => {
                 ))}
               </nav>
             </div>
-            <AddressBox className="bg-gray-800">
+            <div className="bg-gray-800 flex justify-center flex-wrap pb-6">
               {provider ? (
-                <>
-                  <div className="flex items-center">
-                    <div>
-                      <EthIcon
-                        className="inline-block h-9 w-9 rounded-full"
-                        // Address to draw
-                        address={address}
-                        // scale * 8 pixel image size
-                        scale={16}
-                        // <img> props
-                        style={{
-                          background: 'red',
-                        }}
-                      />
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-white">{address ? shortenAddress(address) : 'None Set'}</p>
-                      <p className="text-xs font-medium text-gray-300 group-hover:text-gray-200">
-                        {!address ? 'Connect Wallet' : null}
-                      </p>
-                    </div>
+                <div className="flex items-center">
+                  <div>
+                    <EthIcon
+                      className="inline-block h-9 w-9 rounded-full"
+                      // Address to draw
+                      address={address}
+                      // scale * 8 pixel image size
+                      scale={16}
+                      // <img> props
+                      style={{
+                        background: 'red',
+                      }}
+                    />
                   </div>
-                  <div className="flex items-center justify-center">
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-white">{address ? shortenAddress(address) : 'None Set'}</p>
                     <p className="text-xs font-medium text-white">
                       {sweeperBalance ? `${sweeperBalance} $SWEEP 🧹` : null}
                     </p>
                   </div>
-                </>
+                </div>
               ) : null}
               <WalletButton provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal} />
-            </AddressBox>
+            </div>
           </div>
         </div>
       </div>

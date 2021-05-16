@@ -3,15 +3,16 @@ import { ethers } from 'ethers';
 import { ChartBarIcon, CurrencyYenIcon, FireIcon } from '@heroicons/react/outline';
 import CountUp from 'react-countup';
 
+import { formatAmount } from '../../utils/index';
+
 const getData = async (sweeperContract, provider, setsupplyInfo, setburnInfo): Promise<void> => {
   if (!provider) {
     return;
   }
   const totalSupply = await sweeperContract.totalSupply();
-  const ts = ethers.utils.formatEther(totalSupply);
-  const fixedTS = Number(ts).toFixed(3);
-  const nice = ethers.utils.commify(fixedTS);
-  setsupplyInfo(nice);
+  const formattedSupply = formatAmount(totalSupply);
+
+  setsupplyInfo(formattedSupply);
 
   const lastTransfer = await sweeperContract.lastTransfer();
   const adjuster = await sweeperContract.ADJUSTER();
