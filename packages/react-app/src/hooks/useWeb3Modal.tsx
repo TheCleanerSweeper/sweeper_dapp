@@ -27,7 +27,7 @@ const RPC = {
 function useWeb3Modal(config: any = {}): [Web3Provider, () => Promise<void>, () => Promise<void>] {
   const [provider, setProvider] = useState<Web3Provider>();
   const [autoLoaded, setAutoLoaded] = useState<boolean>(false);
-  const { autoLoad = true } = config;
+  const { autoLoad = false } = config;
 
   // Web3Modal also supports many other wallets.
   // You can see other options at https://github.com/Web3Modal/web3modal

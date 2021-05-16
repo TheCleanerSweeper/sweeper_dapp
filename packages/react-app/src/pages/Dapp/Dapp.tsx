@@ -46,7 +46,7 @@ const Dapp: React.FC = () => {
 
   const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal();
 
-  async function addEthereum(): Promise<void> {
+  async function addSigner(): Promise<void> {
     const network = await provider.getNetwork();
     if (network.chainId !== 56 && network.chainId !== 5) {
       setCorrectChain(true);
@@ -73,15 +73,15 @@ const Dapp: React.FC = () => {
     setsweeperContract(contract);
   };
 
+  if (provider) {
+    addSigner();
+  }
+
   useEffect(() => {
     if (address) {
       getSweepBalance(provider, address);
     }
   }, [provider, address]);
-
-  if (provider) {
-    addEthereum();
-  }
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
