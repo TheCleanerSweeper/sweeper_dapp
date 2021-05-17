@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { Web3Provider } from '@ethersproject/providers';
 import Web3Modal from 'web3modal';
 import WalletConnectProvider from '@walletconnect/web3-provider';
@@ -27,22 +26,28 @@ const RPC = {
 function useWeb3Modal(config: any = {}): [Web3Provider, () => Promise<void>, () => Promise<void>] {
   const [provider, setProvider] = useState<Web3Provider>();
   const [autoLoaded, setAutoLoaded] = useState<boolean>(false);
-  const { autoLoad = false } = config;
+  const { autoLoad = true } = config;
 
   // Web3Modal also supports many other wallets.
   // You can see other options at https://github.com/Web3Modal/web3modal
-  const web3Modal = new Web3Modal({
-    // network: NETWORK,
-    cacheProvider: true,
-    providerOptions: {
-      walletconnect: {
-        package: WalletConnectProvider,
-        options: {
-          RPC,
+  const web3Modal = useMemo(
+    () =>
+      /* eslint-disable implicit-arrow-linebreak */
+      new Web3Modal({
+        /* eslint-enable implicit-arrow-linebreak */
+        // network: NETWORK,
+        cacheProvider: true,
+        providerOptions: {
+          walletconnect: {
+            package: WalletConnectProvider,
+            options: {
+              RPC,
+            },
+          },
         },
-      },
-    },
-  });
+      }),
+    [],
+  );
 
   // Open wallet selection modal.
   const loadWeb3Modal = useCallback(async () => {

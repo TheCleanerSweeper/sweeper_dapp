@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { ChartBarIcon, CurrencyYenIcon, FireIcon } from '@heroicons/react/outline';
 import CountUp from 'react-countup';
+import { useWeb3React } from '@web3-react/core';
+import { Web3Provider } from '@ethersproject/providers';
 
 import { formatAmount } from '../../utils/index';
 
@@ -34,18 +36,19 @@ const getData = async (sweeperContract, provider, setsupplyInfo, setburnInfo): P
 
 interface DashBoardProps {
   sweeperContract: ethers.Contract;
-  provider: ethers.providers.Web3Provider;
 }
 
-const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract, provider }: DashBoardProps) => {
+const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract }: DashBoardProps) => {
   const [supplyInfo, setsupplyInfo] = useState('');
   const [burnInfo, setburnInfo] = useState();
 
+  const { library } = useWeb3React<Web3Provider>();
+
   useEffect(() => {
     if (sweeperContract) {
-      getData(sweeperContract, provider, setsupplyInfo, setburnInfo);
+      getData(sweeperContract, library, setsupplyInfo, setburnInfo);
     }
-  }, [sweeperContract, provider]);
+  }, [sweeperContract, library]);
 
   return (
     <>
@@ -88,7 +91,9 @@ const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract, provider }: Dash
                 Burn Rate:
               </div>
               <div className=" mt-4">
-                <span className={Number(burnInfo) < 0 ? 'text-red-500' : 'text-green-500'}>{`${burnInfo}%`}</span>
+                <span className={Number(burnInfo) < 0 ? 'text-red-500' : 'text-green-500'}>
+                  {burnInfo ? `${burnInfo}%` : ''}
+                </span>
               </div>
             </div>
           </>

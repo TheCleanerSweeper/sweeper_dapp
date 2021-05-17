@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { useWeb3React } from '@web3-react/core';
+import { Web3Provider } from '@ethersproject/providers';
 
-interface WalletButtonProps {
-  provider: any;
-  loadWeb3Modal: () => Promise<void>;
-  logoutOfWeb3Modal: () => Promise<void>;
+import { injected, network } from '../../connectors';
+
+enum ConnectorNames {
+  Injected = 'Injected',
+  Network = 'Network',
+  // WalletConnect = 'WalletConnect',
 }
+
+const connectorsByName: { [connectorName in ConnectorNames]: any } = {
+  [ConnectorNames.Injected]: injected,
+  [ConnectorNames.Network]: network,
+  // [ConnectorNames.WalletConnect]: walletconnect
+};
 
 const Button = styled.button`
 color: white;
@@ -30,18 +40,35 @@ margin-top: 1rem;
 }
 `;
 
-const WalletButton: React.FC<WalletButtonProps> = ({ provider, loadWeb3Modal, logoutOfWeb3Modal }) => (
-  <Button
-    onClick={() => {
-      if (!provider) {
-        loadWeb3Modal();
-      } else {
-        logoutOfWeb3Modal();
-      }
-    }}
-  >
-    {!provider ? 'Connect Wallet' : 'Disconnect Wallet'}
-  </Button>
-);
+const WalletButton: React.FC = () => {
+  const [activatingConnector, setActivatingConnector] = useState<any>();
+  const [loggedIn, setloggedIn] = useState<boolean>(false);
+
+  const context = useWeb3React<Web3Provider>();
+  const { connector, activate, deactivate, active, error } = context;
+
+  useEffect(() => {
+    if (activatingConnector && activatingConnector === connector) {
+      setActivatingConnector(undefined);
+    }
+  }, [activatingConnector, connector]);
+
+  return (
+    <Button
+      onClick={() => {
+        if (!active) {
+          setActivatingConnector(injected);
+          activate(injected);
+          setloggedIn(true);
+        } else {
+          deactivate();
+          setloggedIn(false);
+        }
+      }}
+    >
+      {!active ? 'Connect Wallet' : 'Disconnect Wallet'}
+    </Button>
+  );
+};
 
 export default WalletButton;

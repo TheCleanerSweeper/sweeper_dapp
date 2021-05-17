@@ -5,6 +5,9 @@ import EthIcon from 'eth-icon';
 import { addresses, abis } from '@project/contracts';
 import { ethers } from 'ethers';
 
+import { useWeb3React } from '@web3-react/core';
+import { Web3Provider } from '@ethersproject/providers';
+
 import Popup from './Popup';
 import { getAirdropInfo, getClaimableAmount, AirdropData } from '../../utils/airdrop';
 import FallingBunnies from '../Effects.js';
@@ -373,38 +376,40 @@ const ClaimAirdropPopup: React.FC<AirdropProps> = ({
 };
 
 interface ClaimProps {
-  address: any;
-  provider: any;
-  signer: any;
   sweeperBalance: any;
 }
 
-const Claim: React.FC<ClaimProps> = ({ address, provider, signer, sweeperBalance }: ClaimProps) => {
+const Claim: React.FC<ClaimProps> = ({ sweeperBalance }: ClaimProps) => {
   const [balance, setBalance] = useState(sweeperBalance);
-
   const [showPopup, setShowPopup] = useState(false);
   const [claimableAmount, setClaimableAmount] = useState(0);
   const [isRedeemed, setIsRedeemed] = useState(false);
   const [expire, setExpire] = useState(0);
-
   const [airdropSigner, setAirdropSigner] = useState();
-
   const [airdropInfo, setAirdropInfo] = useState();
-
+  const [signer, setSigner] = useState<any>();
   const [open, setOpen] = useState(false);
+
+  const { library, account } = useWeb3React<Web3Provider>();
 
   useEffect(() => {
     setBalance(sweeperBalance);
   }, [sweeperBalance]);
 
+  useEffect(() => {
+    if (library) {
+      setSigner(library.getSigner(account));
+    }
+  }, [library, setSigner]);
+
   return (
     <>
       {showPopup && !isRedeemed && claimableAmount > 0 ? <FallingBunnies /> : null}
       <ClaimModal
-        address={address}
-        balance={balance}
-        provider={provider}
+        address={account}
+        provider={library}
         signer={signer}
+        balance={balance}
         setShowPopup={setShowPopup}
         setClaimableAmount={setClaimableAmount}
         setIsRedeemed={setIsRedeemed}
@@ -419,7 +424,7 @@ const Claim: React.FC<ClaimProps> = ({ address, provider, signer, sweeperBalance
         </p>
       </Popup>
       <ClaimAirdropPopup
-        addr={address}
+        addr={account}
         open={showPopup}
         setOpen={setShowPopup}
         claimAmount={claimableAmount}

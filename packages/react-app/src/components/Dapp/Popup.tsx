@@ -12,7 +12,7 @@ const Popup: React.FC<PopupProps> = ({ title, children, setOpen, open }: PopupPr
   let cancelButtonRef = useRef(null); // eslint-disable-line prefer-const
 
   return (
-    <>
+    <div>
       <Transition.Root show={open} as={Fragment}>
         <Dialog
           as="div"
@@ -85,7 +85,7 @@ const Popup: React.FC<PopupProps> = ({ title, children, setOpen, open }: PopupPr
           </div>
         </Dialog>
       </Transition.Root>
-    </>
+    </div>
   );
 };
 

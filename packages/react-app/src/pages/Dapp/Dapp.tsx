@@ -5,8 +5,9 @@ import { addresses, abis } from '@project/contracts';
 import { MenuIcon, XIcon, GiftIcon, HomeIcon } from '@heroicons/react/outline';
 import EthIcon from 'eth-icon';
 import { ethers } from 'ethers';
+import { useWeb3React } from '@web3-react/core';
+import { Web3Provider } from '@ethersproject/providers';
 
-import useWeb3Modal from '../../hooks/useWeb3Modal';
 import logo from '../../images/logo.svg';
 import Claim from '../../components/Dapp/Claim';
 import Dashboard from '../../components/Dapp/Dashboard';
@@ -14,6 +15,8 @@ import Popup from '../../components/Dapp/Popup';
 import WalletButton from '../../components/Dapp/walletButton';
 
 import { shortenAddress, formatAmount } from '../../utils/index';
+import { useInactiveListener } from '../../hooks/useInactiveListener';
+import { useEagerConnect } from '../../hooks/useEagerConnect';
 
 const navigation = [
   { name: 'Dashboard', href: '#/app/dashboard', icon: HomeIcon, current: true },
@@ -38,34 +41,23 @@ function classNames(...classes): string {
 
 const Dapp: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [address, setAddress] = useState('');
-  const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>();
   const [sweeperBalance, setSweeperBalance] = useState('');
   const [sweeperContract, setsweeperContract] = useState<ethers.Contract>();
-  const [correctChain, setCorrectChain] = useState(false);
 
-  const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal();
+  const { library, chainId, account } = useWeb3React<Web3Provider>();
 
-  async function addSigner(): Promise<void> {
-    const network = await provider.getNetwork();
-    if (network.chainId !== 56 && network.chainId !== 5) {
-      setCorrectChain(true);
-      return;
-    }
+  const triedEager = useEagerConnect();
 
-    const snr = provider.getSigner();
-    setSigner(snr);
+  useInactiveListener(!triedEager);
 
-    const addr = await snr.getAddress();
-    setAddress(addr);
-  }
+  console.log(library, account);
 
   const getSweepBalance = async (pvd: ethers.providers.Web3Provider, addr: string): Promise<void> => {
     if (!pvd) return;
 
     const contractAddress = addresses.sweeperdaoBSCMainnet;
     const abi = abis.sweeperdao;
-    const contract = new ethers.Contract(contractAddress, abi, provider);
+    const contract = new ethers.Contract(contractAddress, abi, pvd);
     const balance = await contract.balanceOf(addr);
     const nice = formatAmount(balance);
 
@@ -73,19 +65,15 @@ const Dapp: React.FC = () => {
     setsweeperContract(contract);
   };
 
-  if (provider) {
-    addSigner();
-  }
-
   useEffect(() => {
-    if (address) {
-      getSweepBalance(provider, address);
+    if (account) {
+      getSweepBalance(library, account);
     }
-  }, [provider, address]);
+  }, [library, account]);
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
-      {correctChain ? (
+      {/* {correctChain ? (
         <Popup title="Incorrect Chain" open={correctChain} setOpen={setCorrectChain}>
           <p className="text-sm text-gray-500">
             The wallet you are using is not connected to the correct chain. To connect your wallet to Binance smart
@@ -99,7 +87,7 @@ const Dapp: React.FC = () => {
             </a>
           </p>
         </Popup>
-      ) : null}
+      ) : null} */}
       <Transition.Root show={sidebarOpen} as={Fragment}>
         <Dialog
           as="div"
@@ -181,7 +169,7 @@ const Dapp: React.FC = () => {
               </div>
               <div className="flex-shrink-0 flex bg-gray-700 p-4">
                 <a
-                  href={`https://bscscan.com/address/${address}`}
+                  href={`https://bscscan.com/address/${account}`}
                   target="_blank"
                   rel="noreferrer"
                   className="flex-shrink-0 group block"
@@ -191,7 +179,7 @@ const Dapp: React.FC = () => {
                       <EthIcon
                         className="inline-block h-9 w-9 rounded-full"
                         // Address to draw
-                        address={address}
+                        address={account}
                         // scale * 8 pixel image size
                         scale={16}
                         // <img> props
@@ -201,7 +189,7 @@ const Dapp: React.FC = () => {
                       />
                     </div>
                     <div className="ml-3">
-                      <p className="text-sm font-medium text-white">{address ? shortenAddress(address) : 'None Set'}</p>
+                      <p className="text-sm font-medium text-white">{account ? shortenAddress(account) : 'None Set'}</p>
                     </div>
                   </div>
                 </a>
@@ -247,13 +235,13 @@ const Dapp: React.FC = () => {
               </nav>
             </div>
             <div className="bg-gray-800 flex justify-center flex-wrap pb-6">
-              {provider ? (
+              {library ? (
                 <div className="flex items-center">
                   <div>
                     <EthIcon
                       className="inline-block h-9 w-9 rounded-full"
                       // Address to draw
-                      address={address}
+                      address={account}
                       // scale * 8 pixel image size
                       scale={16}
                       // <img> props
@@ -263,14 +251,14 @@ const Dapp: React.FC = () => {
                     />
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-white">{address ? shortenAddress(address) : 'None Set'}</p>
+                    <p className="text-sm font-medium text-white">{account ? shortenAddress(account) : 'None Set'}</p>
                     <p className="text-xs font-medium text-white">
                       {sweeperBalance ? `${sweeperBalance} $SWEEP 🧹` : null}
                     </p>
                   </div>
                 </div>
               ) : null}
-              <WalletButton provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal} />
+              <WalletButton />
             </div>
           </div>
         </div>
@@ -295,17 +283,8 @@ const Dapp: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="py-2">
               <Switch>
-                <Route
-                  path="/app/dashboard"
-                  render={(props) => <Dashboard sweeperContract={sweeperContract} provider={provider} />}
-                />
-                <Route
-                  exact
-                  path="/app/claim"
-                  render={(props) => (
-                    <Claim address={address} provider={provider} signer={signer} sweeperBalance={sweeperBalance} />
-                  )}
-                />
+                <Route path="/app/dashboard" render={() => <Dashboard sweeperContract={sweeperContract} />} />
+                <Route exact path="/app/claim" render={() => <Claim sweeperBalance={sweeperBalance} />} />
               </Switch>
             </div>
           </div>
