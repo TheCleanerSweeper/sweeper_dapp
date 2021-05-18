@@ -12,7 +12,7 @@ import logo from '../../images/logo.svg';
 import Claim from '../../components/Dapp/Claim';
 import Dashboard from '../../components/Dapp/Dashboard';
 import Popup from '../../components/Dapp/Popup';
-import WalletButton from '../../components/Dapp/walletButton';
+import WalletButton from '../../components/Dapp/WalletModal/connectModal';
 
 import { shortenAddress, formatAmount } from '../../utils/index';
 import { useInactiveListener } from '../../hooks/useInactiveListener';

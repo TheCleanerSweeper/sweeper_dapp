@@ -1,21 +1,20 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import Text from "../../components/Text/Text";
-import { CopyIcon } from "../../components/Svg";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { CopyIcon } from '../../Svg';
 
 interface Props {
   toCopy: string;
 }
 
-const StyleButton = styled(Text).attrs({ role: "button" })`
+const StyleButton = styled(p).attrs({ role: 'button' })`
   position: relative;
   display: flex;
   align-items: center;
   color: ${({ theme }) => theme.colors.primary};
 `;
 
-const Tooltip = styled.div<{ isTooltipDisplayed: boolean }>`
-  display: ${({ isTooltipDisplayed }) => (isTooltipDisplayed ? "block" : "none")};
+const Tooltip = styled.div`
+  display: ${({ isTooltipDisplayed }) => (isTooltipDisplayed ? 'block' : 'none')};
   position: absolute;
   bottom: -22px;
   right: 0;
@@ -43,7 +42,7 @@ const CopyToClipboard: React.FC<Props> = ({ toCopy, children, ...props }) => {
           }, 1000);
         }
       }}
-      {...props}
+      {...props} /* eslint-disable-line */
     >
       {children}
       <CopyIcon width="20px" color="primary" ml="4px" />

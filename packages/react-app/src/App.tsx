@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 
 import NavBar from './components/NavBar';
 import Footer from './components/Footer';
 import Landing from './pages/Landing/Landing';
 import Dapp from './pages/Dapp/Dapp';
-import useWeb3Modal from './hooks/useWeb3Modal';
 
 function App(): any {
   return (
