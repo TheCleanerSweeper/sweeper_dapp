@@ -58,7 +58,7 @@ const checkClaim = async (
   setShowPopup(true);
 };
 
-interface ClaimModalProps {
+interface ClaimCardProps {
   address: string;
   provider: any;
   signer: any;
@@ -71,7 +71,7 @@ interface ClaimModalProps {
   setAirdropSigner: any;
 }
 
-const ClaimModal: React.FunctionComponent<ClaimModalProps> = ({
+const ClaimCard: React.FC<ClaimCardProps> = ({
   address,
   provider,
   signer,
@@ -82,7 +82,7 @@ const ClaimModal: React.FunctionComponent<ClaimModalProps> = ({
   setExpire,
   setAirdropInfo,
   setAirdropSigner,
-}: ClaimModalProps) => (
+}: ClaimCardProps) => (
   <div
     className="mt-16 overflow-hidden shadow rounded-lg
      divide-y divide-gray-200 justify-center text-center text-3xl bg-gray-200"
@@ -390,22 +390,26 @@ const Claim: React.FC<ClaimProps> = ({ sweeperBalance }: ClaimProps) => {
   const [signer, setSigner] = useState<any>();
   const [open, setOpen] = useState(false);
 
-  const { library, account } = useWeb3React<Web3Provider>();
+  const { library, account, active } = useWeb3React<Web3Provider>();
 
   useEffect(() => {
+    if (!active) {
+      setBalance(0);
+      return;
+    }
     setBalance(sweeperBalance);
-  }, [sweeperBalance]);
+  }, [sweeperBalance, active]);
 
   useEffect(() => {
     if (library) {
       setSigner(library.getSigner(account));
     }
-  }, [library, setSigner]);
+  }, [library, setSigner, active]);
 
   return (
-    <>
+    <div>
       {showPopup && !isRedeemed && claimableAmount > 0 ? <FallingBunnies /> : null}
-      <ClaimModal
+      <ClaimCard
         address={account}
         provider={library}
         signer={signer}
@@ -417,12 +421,12 @@ const Claim: React.FC<ClaimProps> = ({ sweeperBalance }: ClaimProps) => {
         setAirdropInfo={setAirdropInfo}
         setAirdropSigner={setAirdropSigner}
       />
-      <Popup title="Claim Airdrop" open={open} setOpen={setOpen}>
+      {/* <Popup title="Claim Airdrop" open={open} setOpen={setOpen}>
         <p className="text-sm text-gray-500">
           Allocations of $SWEEP are airdropped to rugpull victims and community contributers. Continue on to check if
           your address is available to earn $SWEEP.
         </p>
-      </Popup>
+      </Popup> */}
       <ClaimAirdropPopup
         addr={account}
         open={showPopup}
@@ -433,7 +437,7 @@ const Claim: React.FC<ClaimProps> = ({ sweeperBalance }: ClaimProps) => {
         adInfo={airdropInfo}
         adSigner={airdropSigner}
       />
-    </>
+    </div>
   );
 };
 

@@ -11,8 +11,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import logo from '../../images/logo.svg';
 import Claim from '../../components/Dapp/Claim';
 import Dashboard from '../../components/Dapp/Dashboard';
-import Popup from '../../components/Dapp/Popup';
-import ConnectWallet from '../../components/Dapp/WalletModal/ConnectModal';
+import ConnectModal from '../../components/Dapp/WalletModal/ConnectModal';
 
 import { shortenAddress, formatAmount } from '../../utils/index';
 import { getErrorMessage } from '../../utils/error';
@@ -73,7 +72,7 @@ const Dapp: React.FC = () => {
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
       {!!error && <h4 style={{ marginTop: '1rem', marginBottom: '0' }}>{getErrorMessage(error)}</h4>}
-      {/* {correctChain ? (
+      {/* {!!error  ? (
         <Popup title="Incorrect Chain" open={correctChain} setOpen={setCorrectChain}>
           <p className="text-sm text-gray-500">
             The wallet you are using is not connected to the correct chain. To connect your wallet to Binance smart
@@ -258,7 +257,7 @@ const Dapp: React.FC = () => {
                   </div>
                 </div>
               ) : null}
-              <ConnectWallet />
+              <ConnectModal />
             </div>
           </div>
         </div>
