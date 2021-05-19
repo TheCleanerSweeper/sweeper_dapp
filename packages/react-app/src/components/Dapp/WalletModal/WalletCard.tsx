@@ -11,18 +11,24 @@ interface Props {
 const WalletCard: React.FC<Props> = ({ login, walletConfig, onClose, activate }) => {
   const { title, icon: Icon } = walletConfig;
   return (
-    <button
-      type="button"
-      className="w-full, justify-between"
-      onClick={() => {
-        login(walletConfig.connectorId);
-        activate(walletConfig.connectorId);
-        onClose();
-      }}
-    >
-      <p className="text-bold">{title}</p>
-      <Icon width="32px" />
-    </button>
+    <div>
+      <div className="flex w-auto justify-center">
+
+        <Icon
+          className="cursor-pointer transform hover:-translate-y-1 hover:scale-110"
+          width="48px"
+          onClick={() => {
+            login(walletConfig.connectorId);
+            activate(walletConfig.connectorId);
+            onClose();
+          }}
+        />
+      </div>
+      <div className="flex mt-4">
+        <p className=" justify-center text-center">{title}</p>
+      </div>
+    </div>
+
   );
 };
 

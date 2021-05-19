@@ -12,7 +12,7 @@ const Popup: React.FC<PopupProps> = ({ title, children, setOpen, open }: PopupPr
   const cancelButtonRef = useRef();
 
   return (
-    <div>
+    <div className="bg-blue-100">
       <Transition.Root show={open} as={Fragment}>
         <Dialog
           as="div"
@@ -58,10 +58,10 @@ const Popup: React.FC<PopupProps> = ({ title, children, setOpen, open }: PopupPr
                 className="inline-block align-bottom bg-white
              rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl
               transform transition-all sm:my-8 sm:align-middle sm:max-w-lg
-              sm:w-full sm:p-6"
+              sm:w-full sm:p-6 bg-gradient-to-br  from-gray-800 via-gray-900 to-gray-800"
               >
                 <div className="mt-3 text-center sm:mt-5">
-                  <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
+                  <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-white">
                     {title}
                   </Dialog.Title>
                   <div className="mt-2">{children}</div>
@@ -72,7 +72,7 @@ const Popup: React.FC<PopupProps> = ({ title, children, setOpen, open }: PopupPr
                     type="button"
                     ref={cancelButtonRef}
                     className="inline-flex justify-center w-full rounded-md border
-                  border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium
+                  border-transparent shadow-sm px-4 py-2 bg-gradient-to-br  from-indigo-400 via-indigo-600 to-indigo-600 text-base font-medium
                   text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2
                   focus:ring-indigo-500 sm:text-sm"
                     onClick={() => setOpen(false)}

@@ -66,15 +66,17 @@ const ConnectModal: React.FC = () => {
         {!active ? 'Connect Wallet' : 'Disconnect Wallet'}
       </Button>
       <Popup title="Supported Wallets" open={isOpen} setOpen={openModal}>
-        {config.map((entry, index) => (
-          <WalletCard
-            key={entry.title}
-            login={setActivatingConnector}
-            walletConfig={entry}
-            activate={activate}
-            onClose={closeModal}
-          />
-        ))}
+        <div className="flex flex-row mt-8 mb-8 content-center  justify-between text-white">
+          {config.map((entry, index) => (
+            <WalletCard
+              key={entry.title}
+              login={setActivatingConnector}
+              walletConfig={entry}
+              activate={activate}
+              onClose={closeModal}
+            />
+          ))}
+        </div>
       </Popup>
     </>
   );
