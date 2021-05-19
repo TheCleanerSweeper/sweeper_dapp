@@ -2,9 +2,9 @@ import { FC } from 'react';
 
 import Metamask from './icons/Metamask';
 import TrustWallet from './icons/TrustWallet';
-// import WalletConnect from './icons/WalletConnect';
+import WalletConnectIcon from './icons/WalletConnect';
 // import BinanceChain from './icons/BinanceChain';
-import { injected, network } from '../../../connectors';
+import { injected, network, walletconnect } from '../../../connectors';
 
 export interface Config {
   title: string;
@@ -15,13 +15,13 @@ export interface Config {
 enum ConnectorNames {
   Injected = 'Injected',
   Network = 'Network',
-  // WalletConnect = 'WalletConnect',
+  WalletConnect = 'WalletConnect',
 }
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
   [ConnectorNames.Injected]: injected,
   [ConnectorNames.Network]: network,
-  // [ConnectorNames.WalletConnect]: walletconnect,
+  [ConnectorNames.WalletConnect]: walletconnect,
 };
 
 const connectors: Config[] = [
@@ -35,11 +35,11 @@ const connectors: Config[] = [
     icon: TrustWallet,
     connectorId: connectorsByName[ConnectorNames.Injected],
   },
-  // {
-  //   title: 'WalletConnect',
-  //   icon: WalletConnect,
-  //   connectorId: ConnectorNames.WalletConnect,
-  // },
+  {
+    title: 'WalletConnect',
+    icon: WalletConnectIcon,
+    connectorId: connectorsByName[ConnectorNames.WalletConnect],
+  },
   // {
   //   title: 'Binance Chain Wallet',
   //   icon: BinanceChain,

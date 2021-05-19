@@ -9,7 +9,7 @@ interface PopupProps {
 }
 
 const Popup: React.FC<PopupProps> = ({ title, children, setOpen, open }: PopupProps) => {
-  const cancelButtonRef = useRef(null);
+  const cancelButtonRef = useRef();
 
   return (
     <div>
