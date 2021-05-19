@@ -12,7 +12,7 @@ import logo from '../../images/logo.svg';
 import Claim from '../../components/Dapp/Claim';
 import Dashboard from '../../components/Dapp/Dashboard';
 import Popup from '../../components/Dapp/Popup';
-import ConnectWallet from '../../components/Dapp/WalletModal/connectModal';
+import ConnectWallet from '../../components/Dapp/WalletModal/ConnectModal';
 
 import { shortenAddress, formatAmount } from '../../utils/index';
 import { getErrorMessage } from '../../utils/error';
