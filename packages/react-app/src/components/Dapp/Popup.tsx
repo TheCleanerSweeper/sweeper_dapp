@@ -9,7 +9,7 @@ interface PopupProps {
 }
 
 const Popup: React.FC<PopupProps> = ({ title, children, setOpen, open }: PopupProps) => {
-  let cancelButtonRef = useRef(null); // eslint-disable-line prefer-const
+  const cancelButtonRef = useRef(null);
 
   return (
     <div>

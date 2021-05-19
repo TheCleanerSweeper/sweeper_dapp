@@ -1,31 +1,26 @@
 import React from 'react';
-import { connectorLocalStorageKey } from './config';
-import { Config } from './types';
+import { Config } from './config';
 
 interface Props {
   walletConfig: Config;
-  login: () => void;
-  onDismiss: () => void;
-  activate: () => void;
+  login: any;
+  onClose: any;
+  activate: any;
 }
 
-const WalletCard: React.FC<Props> = ({ login, walletConfig, onDismiss, activate }) => {
+const WalletCard: React.FC<Props> = ({ login, walletConfig, onClose, activate }) => {
   const { title, icon: Icon } = walletConfig;
   return (
     <button
       type="button"
-      className="w-full"
+      className="w-full, justify-between"
       onClick={() => {
         login(walletConfig.connectorId);
-        onDismiss();
+        activate(walletConfig.connectorId);
+        onClose();
       }}
-      style={{ justifyContent: 'space-between' }}
-      mb={mb}
-      id={`wallet-connect-${title.toLocaleLowerCase()}`}
     >
-      <p bold color="primary" mr="16px">
-        {title}
-      </p>
+      <p className="text-bold">{title}</p>
       <Icon width="32px" />
     </button>
   );

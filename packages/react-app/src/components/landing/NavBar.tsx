@@ -2,7 +2,7 @@ import React from 'react';
 import { Popover } from '@headlessui/react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import logo from '../images/logo.svg';
+import logo from '../../images/logo.svg';
 
 const SweepButton = styled.button`
 color: white;

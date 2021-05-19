@@ -9,6 +9,8 @@ import { formatAmount } from '../../utils/index';
 
 const getData = async (sweeperContract, provider, setsupplyInfo, setburnInfo): Promise<void> => {
   if (!provider) {
+    setburnInfo(0);
+    setsupplyInfo('0');
     return;
   }
   const totalSupply = await sweeperContract.totalSupply();
@@ -42,13 +44,13 @@ const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract }: DashBoardProps
   const [supplyInfo, setsupplyInfo] = useState('');
   const [burnInfo, setburnInfo] = useState();
 
-  const { library } = useWeb3React<Web3Provider>();
+  const { library, active } = useWeb3React<Web3Provider>();
 
   useEffect(() => {
     if (sweeperContract) {
       getData(sweeperContract, library, setsupplyInfo, setburnInfo);
     }
-  }, [sweeperContract, library]);
+  }, [sweeperContract, library, active]);
 
   return (
     <>
@@ -92,7 +94,7 @@ const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract }: DashBoardProps
               </div>
               <div className=" mt-4">
                 <span className={Number(burnInfo) < 0 ? 'text-red-500' : 'text-green-500'}>
-                  {burnInfo ? `${burnInfo}%` : ''}
+                  {burnInfo ? `${burnInfo}%` : '%'}
                 </span>
               </div>
             </div>

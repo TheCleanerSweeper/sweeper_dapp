@@ -12,9 +12,10 @@ import logo from '../../images/logo.svg';
 import Claim from '../../components/Dapp/Claim';
 import Dashboard from '../../components/Dapp/Dashboard';
 import Popup from '../../components/Dapp/Popup';
-import WalletButton from '../../components/Dapp/WalletModal/connectModal';
+import ConnectWallet from '../../components/Dapp/WalletModal/connectModal';
 
 import { shortenAddress, formatAmount } from '../../utils/index';
+import { getErrorMessage } from '../../utils/error';
 import { useInactiveListener } from '../../hooks/useInactiveListener';
 import { useEagerConnect } from '../../hooks/useEagerConnect';
 
@@ -44,13 +45,11 @@ const Dapp: React.FC = () => {
   const [sweeperBalance, setSweeperBalance] = useState('');
   const [sweeperContract, setsweeperContract] = useState<ethers.Contract>();
 
-  const { library, chainId, account } = useWeb3React<Web3Provider>();
+  const { library, chainId, account, error } = useWeb3React<Web3Provider>();
 
   const triedEager = useEagerConnect();
 
   useInactiveListener(!triedEager);
-
-  console.log(library, account);
 
   const getSweepBalance = async (pvd: ethers.providers.Web3Provider, addr: string): Promise<void> => {
     if (!pvd) return;
@@ -73,6 +72,7 @@ const Dapp: React.FC = () => {
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
+      {!!error && <h4 style={{ marginTop: '1rem', marginBottom: '0' }}>{getErrorMessage(error)}</h4>}
       {/* {correctChain ? (
         <Popup title="Incorrect Chain" open={correctChain} setOpen={setCorrectChain}>
           <p className="text-sm text-gray-500">
@@ -258,7 +258,7 @@ const Dapp: React.FC = () => {
                   </div>
                 </div>
               ) : null}
-              <WalletButton />
+              <ConnectWallet />
             </div>
           </div>
         </div>
