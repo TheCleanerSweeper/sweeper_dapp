@@ -10,6 +10,7 @@ import { Web3Provider } from '@ethersproject/providers';
 
 import logo from '../../images/logo.svg';
 import Claim from '../../components/Dapp/Claim';
+import Popup from '../../components/Dapp/Popup';
 import Dashboard from '../../components/Dapp/Dashboard';
 import ConnectModal from '../../components/Dapp/WalletModal/ConnectModal';
 
@@ -41,10 +42,15 @@ function classNames(...classes): string {
 
 const Dapp: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [walletError, setWalletError] = useState(false);
   const [sweeperBalance, setSweeperBalance] = useState('');
   const [sweeperContract, setsweeperContract] = useState<ethers.Contract>();
 
-  const { library, chainId, account, error } = useWeb3React<Web3Provider>();
+  function closeModal(): void {
+    setWalletError(false);
+  }
+
+  const { library, account, error } = useWeb3React<Web3Provider>();
 
   const triedEager = useEagerConnect();
 
@@ -69,24 +75,19 @@ const Dapp: React.FC = () => {
     }
   }, [library, account]);
 
+  useEffect(() => {
+    if (error) {
+      setWalletError(true);
+    }
+  }, [error]);
+
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
-      {!!error && <h4 style={{ marginTop: '1rem', marginBottom: '0' }}>{getErrorMessage(error)}</h4>}
-      {/* {!!error  ? (
-        <Popup title="Incorrect Chain" open={correctChain} setOpen={setCorrectChain}>
-          <p className="text-sm text-gray-500">
-            The wallet you are using is not connected to the correct chain. To connect your wallet to Binance smart
-            chain, please see this guide for metamask.
-            <a
-              href="https://academy.binance.com/en/articles/connecting-metamask-to-binance-smart-chain"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              https://academy.binance.com/en/articles/connecting-metamask-to-binance-smart-chain
-            </a>
-          </p>
+      {error ? (
+        <Popup title="Error Connecting Wallet" open={walletError} setOpen={setWalletError} onClose={closeModal}>
+          <p className="text-sm text-gray-500">{getErrorMessage(error)}</p>
         </Popup>
-      ) : null} */}
+      ) : null}
       <Transition.Root show={sidebarOpen} as={Fragment}>
         <Dialog
           as="div"
