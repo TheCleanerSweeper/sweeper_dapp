@@ -85,15 +85,17 @@ const ClaimCard: React.FC<ClaimCardProps> = ({
 }: ClaimCardProps) => (
   <div
     className="mt-16 overflow-hidden shadow rounded-lg
-     divide-y divide-gray-200 justify-center text-center text-3xl bg-gray-200"
+     divide-y divide-indigo-400 justify-center text-center text-3xl bg-gradient-to-br  from-gray-700 via-gray-800 to-gray-700"
   >
     <div
-      className="px-4 py-5 sm:px-6
-       bg-gray-800 text-white"
+      className="flex  justify-center text-center px-4 py-5 sm:px-6
+      bg-gradient-to-br  from-gray-800 via-gray-900 to-gray-800 text-white"
     >
-      🎁 Claim Tokens 🎁
+      <GiftIcon width="38px" className="text-indigo-400" />
+      {' '}
+      Claim Tokens
     </div>
-    <div className="flex sm:p-6 h-auto h-auto text-2xl  mt-4 justify-center">
+    <div className="flex sm:p-6 h-auto h-auto text-2xl  mt-4 justify-center text-white">
       {address ? (
         <EthIcon
           className="inline-block h-9 w-9 rounded-full mx-3"
@@ -111,11 +113,11 @@ const ClaimCard: React.FC<ClaimCardProps> = ({
     </div>
 
     {balance ? (
-      <div className="flex sm:p-6  text-2xl  justify-center">
+      <div className="flex sm:p-6  text-2xl justify-center text-white">
         Balance:
         <span
           className="rounded-md border border-gray-300 pt-2
-             pb-2 pl-4 pr-4 bg-gray-100"
+             pb-2 pl-4 pr-4 ml-2 mr-2 bg-gray-900 transform -translate-y-2"
         >
           {balance}
         </span>
@@ -128,7 +130,7 @@ const ClaimCard: React.FC<ClaimCardProps> = ({
         type="button"
         className="flex w-9/12 inline-flex justify-center
           rounded-md border border-gray-300 shadow-sm mb-10 py-4
-          bg-white text-base font-medium text-gray-700 hover:bg-gray-50
+          bg-gradient-to-br from-indigo-500 via-indigo-500 to-indigo-400  text-base font-medium text-white hover:bg-gray-50
           focus:outline-none focus:ring-2 focus:ring-offset-2
           focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
         onClick={() => {
@@ -212,6 +214,10 @@ const ClaimAirdropPopup: React.FC<AirdropProps> = ({
     setAirdropSigner(adSigner);
   }, [adSigner]);
 
+  console.log(`is redeemd: ${isRedeem}`);
+  console.log(`airdropAmount: ${claimableAmount}`);
+  console.log(`expire: ${expire}`);
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog
@@ -258,7 +264,7 @@ const ClaimAirdropPopup: React.FC<AirdropProps> = ({
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div
-              className="inline-block align-bottom bg-white rounded-lg
+              className="inline-block align-bottom bg-gradient-to-br  from-gray-800 via-gray-900 to-gray-800 rounded-lg
             px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform
             transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
             >
@@ -273,7 +279,7 @@ const ClaimAirdropPopup: React.FC<AirdropProps> = ({
                   <Dialog.Title
                     as="h3"
                     className="text-lg leading-6
-                  font-medium text-gray-900"
+                  font-medium text-white"
                   >
                     {/* eslint-disable
                     no-nested-ternary,
@@ -282,24 +288,24 @@ const ClaimAirdropPopup: React.FC<AirdropProps> = ({
                     {isRedeemed ? 'Airdrop redeemed' : claimableAmount > 0 ? 'You have a claim!' : 'No Claim Available'}
                   </Dialog.Title>
                   <div className="mt-8 mb-8">
-                    <p className="text-xl text-gray-500">
+                    <p className="text-xl text-white">
                       {isRedeemed ? 'Claimed' : 'Claimable'}
                       Amount:{' '}
                       <span
                         className="border rounded-md pt-1 pb-1 pl-4
-                      pr-4 bg-gray-100"
+                      pr-4 bg-gray-900"
                       >
                         {claimableAmount / Math.pow(10, 18)}
                       </span>{' '}
                       $SWEEP 🧹
                     </p>
                   </div>
-                  {!isRedeemed && expire ? (
+                  {!isRedeemed && expire > 0 ? (
                     <div
                       className="mt-2 mb-2 border rounded-md
                     py-6 bg-gray-100"
                     >
-                      <p className="text-base text-gray-500">
+                      <p className="text-base text-white">
                         Expires:{' '}
                         {expire.toLocaleDateString('en-gb', {
                           weekday: 'long',
@@ -317,10 +323,11 @@ const ClaimAirdropPopup: React.FC<AirdropProps> = ({
                 </div>
               </div>
 
-              {isRedeemed || claimableAmount === 0 ? (
+              {isRedeemed || Number(claimableAmount) === 0 ? (
                 <div className="mt-5 sm:mt-6">
                   <button
                     type="button"
+                    ref={cancelButtonRef}
                     className="inline-flex justify-center w-full rounded-md
                     border border-transparent shadow-sm px-4 py-2 bg-indigo-600
                     text-base font-medium text-white hover:bg-indigo-700
@@ -339,6 +346,7 @@ const ClaimAirdropPopup: React.FC<AirdropProps> = ({
                 sm:gap-3 sm:grid-flow-row-dense"
                 >
                   <button
+                    ref={cancelButtonRef}
                     type="button"
                     className="w-full inline-flex justify-center rounded-md
                     border border-transparent shadow-sm px-4 py-2 bg-indigo-600
@@ -388,7 +396,12 @@ const Claim: React.FC<ClaimProps> = ({ sweeperBalance }: ClaimProps) => {
   const [airdropSigner, setAirdropSigner] = useState();
   const [airdropInfo, setAirdropInfo] = useState();
   const [signer, setSigner] = useState<any>();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
+
+  // closes the initial popup modal
+  function closeModal(): void {
+    setOpen(false);
+  }
 
   const { library, account, active } = useWeb3React<Web3Provider>();
 
@@ -421,12 +434,12 @@ const Claim: React.FC<ClaimProps> = ({ sweeperBalance }: ClaimProps) => {
         setAirdropInfo={setAirdropInfo}
         setAirdropSigner={setAirdropSigner}
       />
-      {/* <Popup title="Claim Airdrop" open={open} setOpen={setOpen}>
+      <Popup title="Claim Airdrop" open={open} setOpen={setOpen} onClose={closeModal}>
         <p className="text-sm text-gray-500">
           Allocations of $SWEEP are airdropped to rugpull victims and community contributers. Continue on to check if
           your address is available to earn $SWEEP.
         </p>
-      </Popup> */}
+      </Popup>
       <ClaimAirdropPopup
         addr={account}
         open={showPopup}
