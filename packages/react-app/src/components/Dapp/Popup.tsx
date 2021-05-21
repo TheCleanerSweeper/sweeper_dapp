@@ -75,7 +75,9 @@ const Popup: React.FC<PopupProps> = ({ title, children, setOpen, open, onClose }
                     className="inline-flex justify-center w-full rounded-md border
                   border-transparent shadow-sm px-4 py-2 bg-gradient-to-br  from-indigo-400 via-indigo-600 to-indigo-600 text-base font-medium
                   text-white hover:bg-indigo-700  sm:text-sm"
-                    onClick={() => { onClose(); }}
+                    onClick={() => {
+                      onClose();
+                    }}
                   >
                     Close
                   </button>

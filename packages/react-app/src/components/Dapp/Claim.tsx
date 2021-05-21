@@ -92,7 +92,6 @@ const ClaimCard: React.FC<ClaimCardProps> = ({
       bg-gradient-to-br  from-gray-800 via-gray-900 to-gray-800 text-white"
     >
       <GiftIcon width="38px" className="text-indigo-400" />
-      {' '}
       Claim Tokens
     </div>
     <div className="flex sm:p-6 h-auto h-auto text-2xl  mt-4 justify-center text-white">
@@ -213,10 +212,6 @@ const ClaimAirdropPopup: React.FC<AirdropProps> = ({
   useEffect(() => {
     setAirdropSigner(adSigner);
   }, [adSigner]);
-
-  console.log(`is redeemd: ${isRedeem}`);
-  console.log(`airdropAmount: ${claimableAmount}`);
-  console.log(`expire: ${expire}`);
 
   return (
     <Transition.Root show={open} as={Fragment}>
