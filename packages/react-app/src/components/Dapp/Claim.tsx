@@ -1,0 +1,455 @@
+import React, { Fragment, useRef, useState, useEffect } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import { GiftIcon } from '@heroicons/react/outline';
+import EthIcon from 'eth-icon';
+import { addresses, abis } from '@project/contracts';
+import { ethers } from 'ethers';
+
+import Popup from './Popup';
+import { getAirdropInfo, getClaimableAmount, AirdropData } from '../../utils/airdrop';
+import FallingBunnies from '../Effects.js';
+
+const redeem = async (address, amount, airdropInfo, airdropSigner): Promise<void> => {
+  await airdropSigner.redeemPackage(airdropInfo.index, address, amount, airdropInfo.proof);
+};
+
+const checkClaim = async (
+  address: string,
+  provider: ethers.providers.Web3Provider,
+  signer: string | ethers.providers.Provider | ethers.Signer,
+  setClaimableAmount: React.Dispatch<React.SetStateAction<string>>,
+  setShowPopup: any,
+  setIsRedeemed: React.Dispatch<React.SetStateAction<boolean>>,
+  setExpire: React.Dispatch<React.SetStateAction<Date>>,
+  setAirdropInfo: React.Dispatch<React.SetStateAction<AirdropData>>,
+  setAirdropSigner: any,
+): Promise<void> => {
+  const contractAddress: string = addresses.airdropBSCMainnet;
+  const abi = abis.airdrop;
+  const airdropContract: ethers.Contract = new ethers.Contract(contractAddress, abi, provider);
+  const airdrop: ethers.Contract = airdropContract.connect(signer);
+  setAirdropSigner(airdrop);
+
+  // Return details from the airdrop json
+  const airdropInfo: AirdropData = getAirdropInfo(address);
+
+  // The address is not in the airdrop
+  if (!airdropInfo) {
+    setClaimableAmount('0');
+    setIsRedeemed(false);
+    setExpire(new Date(0));
+  } else {
+    const claimableAmount = getClaimableAmount(airdropInfo);
+    const isRedeemed = await airdrop.redeemed(airdropInfo.index);
+
+    /* prettier-ignore */
+    const expire = await airdrop._blockDeadline(); // eslint-disable-line
+    const date = new Date(expire.toString() * 1000);
+
+    setIsRedeemed(isRedeemed);
+    setClaimableAmount(claimableAmount);
+    setExpire(date);
+    setAirdropInfo(airdropInfo);
+  }
+
+  setShowPopup(true);
+};
+
+interface ClaimModalProps {
+  address: string;
+  addEthereum: any;
+  provider: any;
+  signer: any;
+  balance: any;
+  setClaimableAmount: any;
+  setShowPopup: any;
+  setIsRedeemed: any;
+  setExpire: any;
+  setAirdropInfo: any;
+  setAirdropSigner: any;
+}
+
+const ClaimModal: React.FunctionComponent<ClaimModalProps> = ({
+  address,
+  addEthereum,
+  provider,
+  signer,
+  balance,
+  setClaimableAmount,
+  setShowPopup,
+  setIsRedeemed,
+  setExpire,
+  setAirdropInfo,
+  setAirdropSigner,
+}: ClaimModalProps) => (
+  <div
+    className="mt-16 overflow-hidden shadow rounded-lg
+     divide-y divide-gray-200 justify-center text-center text-3xl bg-gray-200"
+  >
+    <div
+      className="px-4 py-5 sm:px-6
+       bg-gray-800 text-white"
+    >
+      🎁 Claim Tokens 🎁
+    </div>
+    <div className="flex sm:p-6 h-auto h-auto text-2xl  mt-4 justify-center">
+      {address ? (
+        <EthIcon
+          className="inline-block h-9 w-9 rounded-full mx-3"
+          // Address to draw
+          address={address}
+          // scale * 8 pixel image size
+          scale={8}
+          // <img> props
+          style={{
+            background: 'red',
+          }}
+        />
+      ) : null}
+      {address ? `Address: ${address}` : 'Wallet Not Connected'}
+      {!address ? (
+        <button
+          onClick={() => addEthereum()}
+          type="button"
+          className="
+              inline-flex ml-4 justify-center rounded-md border
+              border-gray-300 shadow-sm px-4 py-2 bg-white text-base
+              font-medium text-gray-700 hover:bg-gray-50 focus:outline-none
+              focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0
+              sm:col-start-1 sm:text-sm"
+        >
+          Connect Wallet
+        </button>
+      ) : null}
+    </div>
+
+    {balance ? (
+      <div className="flex sm:p-6  text-2xl  justify-center">
+        Balance:
+        <span
+          className="rounded-md border border-gray-300 pt-2
+             pb-2 pl-4 pr-4 bg-gray-100"
+        >
+          {balance}
+        </span>
+        🧹$SWEEP🧹
+      </div>
+    ) : null}
+
+    {address ? (
+      <button
+        type="button"
+        className="flex w-9/12 inline-flex justify-center
+          rounded-md border border-gray-300 shadow-sm mb-10 py-4
+          bg-white text-base font-medium text-gray-700 hover:bg-gray-50
+          focus:outline-none focus:ring-2 focus:ring-offset-2
+          focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+        onClick={() => {
+          checkClaim(
+            address,
+            // "0x949f435a2508f397c42b5b85993132de9600a3b9",
+            provider,
+            signer,
+            setClaimableAmount,
+            setShowPopup,
+            setIsRedeemed,
+            setExpire,
+            setAirdropInfo,
+            setAirdropSigner,
+          );
+        }}
+        // ref={cancelButtonRef}
+      >
+        Check Eligibility
+      </button>
+    ) : null}
+  </div>
+);
+
+interface AirdropProps {
+  addr: string;
+  isRedeem: any;
+  claimAmount: any;
+  expiration: any;
+  adInfo: any;
+  adSigner: any;
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const ClaimAirdropPopup: React.FC<AirdropProps> = ({
+  addr,
+  open,
+  setOpen,
+  claimAmount,
+  isRedeem,
+  expiration,
+  adInfo,
+  adSigner,
+}: AirdropProps) => {
+  const [claimableAmount, setClaimableAmount] = useState(claimAmount);
+  const [isRedeemed, setIsRedeemed] = useState(isRedeem);
+
+  const [address, setAddress] = useState(addr);
+
+  const [expire, setExpire] = useState(expiration);
+  const [airdropInfo, setAirdropInfo] = useState(adInfo);
+
+  const [airdropSigner, setAirdropSigner] = useState(adSigner);
+
+  const cancelButtonRef = useRef();
+
+  useEffect(() => {
+    setAddress(addr);
+  }, [addr]);
+
+  useEffect(() => {
+    setOpen(open);
+  }, [open, setOpen]);
+
+  useEffect(() => {
+    setClaimableAmount(claimAmount);
+  }, [claimAmount]);
+
+  useEffect(() => {
+    setIsRedeemed(isRedeem);
+  }, [isRedeem]);
+
+  useEffect(() => {
+    setExpire(expiration);
+  }, [expiration]);
+
+  useEffect(() => {
+    setAirdropInfo(adInfo);
+  }, [adInfo]);
+
+  useEffect(() => {
+    setAirdropSigner(adSigner);
+  }, [adSigner]);
+
+  return (
+    <Transition.Root show={open} as={Fragment}>
+      <Dialog
+        as="div"
+        static
+        className="fixed z-10 inset-0 overflow-y-auto"
+        initialFocus={cancelButtonRef}
+        open={open}
+        onClose={setOpen}
+      >
+        <div
+          className="flex items-end justify-center min-h-screen
+         pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <Dialog.Overlay
+              className="fixed inset-0 bg-gray-500
+            bg-opacity-75 transition-opacity"
+            />
+          </Transition.Child>
+
+          <span
+            className="hidden sm:inline-block
+          sm:align-middle sm:h-screen"
+            aria-hidden="true"
+          >
+            &#8203;
+          </span>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            enterTo="opacity-100 translate-y-0 sm:scale-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          >
+            <div
+              className="inline-block align-bottom bg-white rounded-lg
+            px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform
+            transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+            >
+              <div>
+                <div
+                  className="mx-auto flex items-center justify-center h-12 w-12
+                rounded-full bg-green-100"
+                >
+                  <GiftIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
+                </div>
+                <div className="mt-3 text-center sm:mt-5">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg leading-6
+                  font-medium text-gray-900"
+                  >
+                    {/* eslint-disable
+                    no-nested-ternary,
+                    no-restricted-properties,
+                    react/jsx-one-expression-per-line */}
+                    {isRedeemed ? 'Airdrop redeemed' : claimableAmount > 0 ? 'You have a claim!' : 'No Claim Available'}
+                  </Dialog.Title>
+                  <div className="mt-8 mb-8">
+                    <p className="text-xl text-gray-500">
+                      {isRedeemed ? 'Claimed' : 'Claimable'}
+                      Amount:{' '}
+                      <span
+                        className="border rounded-md pt-1 pb-1 pl-4
+                      pr-4 bg-gray-100"
+                      >
+                        {claimableAmount / Math.pow(10, 18)}
+                      </span>{' '}
+                      $SWEEP 🧹
+                    </p>
+                  </div>
+                  {!isRedeemed && expire ? (
+                    <div
+                      className="mt-2 mb-2 border rounded-md
+                    py-6 bg-gray-100"
+                    >
+                      <p className="text-base text-gray-500">
+                        Expires:{' '}
+                        {expire.toLocaleDateString('en-gb', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: 'numeric',
+                          timeZone: 'utc',
+                          timeZoneName: 'short',
+                        })}
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+
+              {isRedeemed || claimableAmount === 0 ? (
+                <div className="mt-5 sm:mt-6">
+                  <button
+                    type="button"
+                    className="inline-flex justify-center w-full rounded-md
+                    border border-transparent shadow-sm px-4 py-2 bg-indigo-600
+                    text-base font-medium text-white hover:bg-indigo-700
+                    focus:outline-none focus:ring-2 focus:ring-offset-2
+                     focus:ring-indigo-500 sm:text-sm"
+                    onClick={() => setOpen(false)}
+                  >
+                    Okay
+                  </button>
+                </div>
+              ) : null}
+
+              {!isRedeemed && claimableAmount > 0 ? (
+                <div
+                  className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2
+                sm:gap-3 sm:grid-flow-row-dense"
+                >
+                  <button
+                    type="button"
+                    className="w-full inline-flex justify-center rounded-md
+                    border border-transparent shadow-sm px-4 py-2 bg-indigo-600
+                    text-base font-medium text-white hover:bg-indigo-700
+                    focus:outline-none focus:ring-2 focus:ring-offset-2
+                    focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
+                    onClick={() => {
+                      redeem(address, claimableAmount, airdropInfo, airdropSigner);
+                      setOpen(false);
+                    }}
+                  >
+                    Claim
+                  </button>
+                  <button
+                    type="button"
+                    className="mt-3 w-full inline-flex justify-center
+                    rounded-md border border-gray-300 shadow-sm px-4
+                    py-2 bg-white text-base font-medium text-gray-700
+                    hover:bg-gray-50 focus:outline-none focus:ring-2
+                    focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0
+                    sm:col-start-1 sm:text-sm"
+                    onClick={() => setOpen(false)}
+                    ref={cancelButtonRef}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          </Transition.Child>
+        </div>
+      </Dialog>
+    </Transition.Root>
+  );
+};
+
+interface ClaimProps {
+  address: any;
+  addEthereum: any;
+  provider: any;
+  signer: any;
+  sweeperBalance: any;
+}
+
+const Claim: React.FC<ClaimProps> = ({ address, addEthereum, provider, signer, sweeperBalance }: ClaimProps) => {
+  const [balance, setBalance] = useState(sweeperBalance);
+
+  const [showPopup, setShowPopup] = useState(false);
+  const [claimableAmount, setClaimableAmount] = useState(0);
+  const [isRedeemed, setIsRedeemed] = useState(false);
+  const [expire, setExpire] = useState(0);
+
+  const [airdropSigner, setAirdropSigner] = useState();
+
+  const [airdropInfo, setAirdropInfo] = useState();
+
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setBalance(sweeperBalance);
+  }, [sweeperBalance]);
+
+  return (
+    <>
+      {showPopup && !isRedeemed && claimableAmount > 0 ? <FallingBunnies /> : null}
+      <ClaimModal
+        address={address}
+        balance={balance}
+        addEthereum={addEthereum}
+        provider={provider}
+        signer={signer}
+        setShowPopup={setShowPopup}
+        setClaimableAmount={setClaimableAmount}
+        setIsRedeemed={setIsRedeemed}
+        setExpire={setExpire}
+        setAirdropInfo={setAirdropInfo}
+        setAirdropSigner={setAirdropSigner}
+      />
+      <Popup title="Claim Airdrop" open={open} setOpen={setOpen}>
+        <p className="text-sm text-gray-500">
+          Allocations of $SWEEP are airdropped to rugpull victims and community contributers. Continue on to check if
+          your address is available to earn $SWEEP.
+        </p>
+      </Popup>
+      <ClaimAirdropPopup
+        addr={address}
+        open={showPopup}
+        setOpen={setShowPopup}
+        claimAmount={claimableAmount}
+        isRedeem={isRedeemed}
+        expiration={expire}
+        adInfo={airdropInfo}
+        adSigner={airdropSigner}
+      />
+    </>
+  );
+};
+
+export default Claim;
