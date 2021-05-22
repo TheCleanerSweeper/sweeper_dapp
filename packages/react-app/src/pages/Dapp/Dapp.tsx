@@ -15,7 +15,7 @@ import Dashboard from '../../components/Dapp/Dashboard';
 import ConnectModal from '../../components/Dapp/WalletModal/ConnectModal';
 
 import { shortenAddress, formatAmount } from '../../utils/index';
-import { getErrorMessage } from '../../utils/error';
+import { ensureNetwork, getErrorMessage } from '../../utils/error';
 import { useInactiveListener } from '../../hooks/useInactiveListener';
 import { useEagerConnect } from '../../hooks/useEagerConnect';
 
@@ -57,7 +57,9 @@ const Dapp: React.FC = () => {
   useInactiveListener(!triedEager);
 
   const getSweepBalance = async (pvd: ethers.providers.Web3Provider, addr: string): Promise<void> => {
-    if (!pvd) return;
+    const [isRightNetwork, err] = ensureNetwork(pvd);
+
+    if (!pvd || !isRightNetwork) return;
 
     const contractAddress = addresses.sweeperdaoBSCMainnet;
     const abi = abis.sweeperdao;
@@ -70,7 +72,7 @@ const Dapp: React.FC = () => {
   };
 
   useEffect(() => {
-    if (account) {
+    if (account && !error) {
       getSweepBalance(library, account);
     }
   }, [library, account]);

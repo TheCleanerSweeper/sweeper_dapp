@@ -84,8 +84,7 @@ const ClaimCard: React.FC<ClaimCardProps> = ({
   setAirdropSigner,
 }: ClaimCardProps) => (
   <div
-    className="mt-16 overflow-hidden shadow rounded-lg
-     divide-y divide-indigo-400 justify-center text-center text-3xl bg-gradient-to-br  from-gray-700 via-gray-800 to-gray-700"
+    className="mt-16 overflow-hidden shadow rounded-lg justify-center text-center text-3xl bg-gradient-to-br  from-gray-700 via-gray-800 to-gray-700"
   >
     <div
       className="flex  justify-center text-center px-4 py-5 sm:px-6
