@@ -3,16 +3,21 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Route, Switch } from 'react-router-dom';
 import { addresses, abis } from '@project/contracts';
 import { MenuIcon, XIcon, GiftIcon, HomeIcon } from '@heroicons/react/outline';
-import styled from 'styled-components';
 import EthIcon from 'eth-icon';
 import { ethers } from 'ethers';
+import { useWeb3React } from '@web3-react/core';
+import { Web3Provider } from '@ethersproject/providers';
 
 import logo from '../../images/logo.svg';
 import Claim from '../../components/Dapp/Claim';
-import Dashboard from '../../components/Dapp/Dashboard';
 import Popup from '../../components/Dapp/Popup';
+import Dashboard from '../../components/Dapp/Dashboard';
+import ConnectModal from '../../components/Dapp/WalletModal/ConnectModal';
 
-import { shortenAddress } from '../../utils/index';
+import { shortenAddress, formatAmount } from '../../utils/index';
+import { ensureNetwork, getErrorMessage } from '../../utils/error';
+import { useInactiveListener } from '../../hooks/useInactiveListener';
+import { useEagerConnect } from '../../hooks/useEagerConnect';
 
 const navigation = [
   { name: 'Dashboard', href: '#/app/dashboard', icon: HomeIcon, current: true },
@@ -35,102 +40,54 @@ function classNames(...classes): string {
   return classes.filter(Boolean).join(' ');
 }
 
-const AddressBox = styled.div`
-  padding-top: 10%;
-  padding-bottom: 10%;
-  padding-right: 10%;
-  padding-left: 10%;
-  &: hover {
-    background-color: #374151;
-    cursor: pointer;
-  }
-`;
-
 const Dapp: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [address, setAddress] = useState('');
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider>();
-  const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>();
+  const [walletError, setWalletError] = useState(false);
   const [sweeperBalance, setSweeperBalance] = useState('');
-  const [hasMetamask, setHasMetamask] = useState<boolean>();
   const [sweeperContract, setsweeperContract] = useState<ethers.Contract>();
-  const [correctChain, setCorrectChain] = useState(false);
 
-  if (window.ethereum) {
-    window.ethereum.on('accountsChanged', (accounts: [string]) => {
-      // Time to reload your interface with accounts[0]!
-      setAddress(accounts[0]);
-    });
+  function closeModal(): void {
+    setWalletError(false);
   }
 
-  async function addEthereum(): Promise<void> {
-    if (!window.ethereum) {
-      // todo handle no metamask state
-      setHasMetamask(false);
-      return;
-    }
-    setHasMetamask(true);
-    await window.ethereum.request({
-      method: 'eth_requestAccounts',
-    });
+  const { library, account, error } = useWeb3React<Web3Provider>();
 
-    if (!window.ethereum) {
-      return;
-    }
-    await window.ethereum.enable();
-    // A Web3Provider wraps a standard Web3 provider, which is
-    // what Metamask injects as window.ethereum into each page
-    const provider2 = new ethers.providers.Web3Provider(window.ethereum);
-    setProvider(provider2);
+  const triedEager = useEagerConnect();
 
-    const network = await provider2.getNetwork();
-    if (network.chainId !== 56 && network.chainId !== 5) {
-      setCorrectChain(true);
-      return;
-    }
-    // The Metamask plugin also allows signing transactions to
-    // send ether and pay to change state within the blockchain.
-    // For this, you need the account signer...
-    const signer2 = provider2.getSigner();
-    setSigner(signer2);
-
-    const address2 = window.ethereum.selectedAddress;
-    setAddress(address2);
-  }
+  useInactiveListener(!triedEager);
 
   const getSweepBalance = async (pvd: ethers.providers.Web3Provider, addr: string): Promise<void> => {
-    if (!pvd) return;
+    const [isRightNetwork, err] = ensureNetwork(pvd);
+
+    if (!pvd || !isRightNetwork) return;
 
     const contractAddress = addresses.sweeperdaoBSCMainnet;
     const abi = abis.sweeperdao;
-    const contract = new ethers.Contract(contractAddress, abi, provider);
+    const contract = new ethers.Contract(contractAddress, abi, pvd);
     const balance = await contract.balanceOf(addr);
-    const formattedBalance = ethers.utils.formatUnits(balance.toString(), 18);
-    setSweeperBalance(formattedBalance);
+    const nice = formatAmount(balance);
+
+    setSweeperBalance(nice);
     setsweeperContract(contract);
   };
 
   useEffect(() => {
-    if (address) {
-      getSweepBalance(provider, address);
+    if (account && !error) {
+      getSweepBalance(library, account);
     }
-  }, [provider, address]);
+  }, [library, account]);
+
+  useEffect(() => {
+    if (error) {
+      setWalletError(true);
+    }
+  }, [error]);
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
-      {correctChain ? (
-        <Popup title="Incorrect Chain" open={correctChain} setOpen={setCorrectChain}>
-          <p className="text-sm text-gray-500">
-            The wallet you are using is not connected to the correct chain. To connect your wallet to Binance smart
-            chain, please see this guide for metamask.
-            <a
-              href="https://academy.binance.com/en/articles/connecting-metamask-to-binance-smart-chain"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              https://academy.binance.com/en/articles/connecting-metamask-to-binance-smart-chain
-            </a>
-          </p>
+      {error ? (
+        <Popup title="Error Connecting Wallet" open={walletError} setOpen={setWalletError} onClose={closeModal}>
+          <p className="text-sm text-gray-500">{getErrorMessage(error)}</p>
         </Popup>
       ) : null}
       <Transition.Root show={sidebarOpen} as={Fragment}>
@@ -214,7 +171,7 @@ const Dapp: React.FC = () => {
               </div>
               <div className="flex-shrink-0 flex bg-gray-700 p-4">
                 <a
-                  href={`https://bscscan.com/address/${address}`}
+                  href={`https://bscscan.com/address/${account}`}
                   target="_blank"
                   rel="noreferrer"
                   className="flex-shrink-0 group block"
@@ -224,7 +181,7 @@ const Dapp: React.FC = () => {
                       <EthIcon
                         className="inline-block h-9 w-9 rounded-full"
                         // Address to draw
-                        address={address}
+                        address={account}
                         // scale * 8 pixel image size
                         scale={16}
                         // <img> props
@@ -234,7 +191,7 @@ const Dapp: React.FC = () => {
                       />
                     </div>
                     <div className="ml-3">
-                      <p className="text-sm font-medium text-white">{address ? shortenAddress(address) : 'None Set'}</p>
+                      <p className="text-sm font-medium text-white">{account ? shortenAddress(account) : 'None Set'}</p>
                     </div>
                   </div>
                 </a>
@@ -279,34 +236,32 @@ const Dapp: React.FC = () => {
                 ))}
               </nav>
             </div>
-            <AddressBox className=" bg-gray-800 p-4" onClick={() => addEthereum()}>
-              <div className="flex items-center">
-                <div>
-                  <EthIcon
-                    className="inline-block h-9 w-9 rounded-full"
-                    // Address to draw
-                    address={address}
-                    // scale * 8 pixel image size
-                    scale={16}
-                    // <img> props
-                    style={{
-                      background: 'red',
-                    }}
-                  />
+            <div className="bg-gray-800 flex justify-center flex-wrap pb-6">
+              {library ? (
+                <div className="flex items-center">
+                  <div>
+                    <EthIcon
+                      className="inline-block h-9 w-9 rounded-full"
+                      // Address to draw
+                      address={account}
+                      // scale * 8 pixel image size
+                      scale={16}
+                      // <img> props
+                      style={{
+                        background: 'red',
+                      }}
+                    />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-white">{account ? shortenAddress(account) : 'None Set'}</p>
+                    <p className="text-xs font-medium text-white">
+                      {sweeperBalance ? `${sweeperBalance} $SWEEP 🧹` : null}
+                    </p>
+                  </div>
                 </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-white">{address ? shortenAddress(address) : 'None Set'}</p>
-                  <p className="text-xs font-medium text-gray-300 group-hover:text-gray-200">
-                    {!address ? 'Connect Wallet' : null}
-                  </p>
-                </div>
-              </div>
-              <div className="flex mt-5 items-center justify-center">
-                <p className="text-xs font-medium text-white">
-                  {sweeperBalance ? `${sweeperBalance} $SWEEP 🧹` : null}
-                </p>
-              </div>
-            </AddressBox>
+              ) : null}
+              <ConnectModal />
+            </div>
           </div>
         </div>
       </div>
@@ -330,25 +285,8 @@ const Dapp: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="py-2">
               <Switch>
-                <Route
-                  path="/app/dashboard"
-                  render={(props) => (
-                    <Dashboard sweeperContract={sweeperContract} provider={provider} addEthereum={addEthereum} />
-                  )}
-                />
-                <Route
-                  exact
-                  path="/app/claim"
-                  render={(props) => (
-                    <Claim
-                      address={address}
-                      addEthereum={addEthereum}
-                      provider={provider}
-                      signer={signer}
-                      sweeperBalance={sweeperBalance}
-                    />
-                  )}
-                />
+                <Route path="/app/dashboard" render={() => <Dashboard sweeperContract={sweeperContract} />} />
+                <Route exact path="/app/claim" render={() => <Claim sweeperBalance={sweeperBalance} />} />
               </Switch>
             </div>
           </div>

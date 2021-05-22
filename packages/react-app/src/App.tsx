@@ -1,12 +1,12 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 
-import NavBar from './components/NavBar';
-import Footer from './components/Footer';
+import NavBar from './components/landing/NavBar';
+import Footer from './components/landing/Footer';
 import Landing from './pages/Landing/Landing';
 import Dapp from './pages/Dapp/Dapp';
 
-function App(): React.ReactNode {
+function App(): any {
   return (
     <div className="flex flex-col">
       <Route path="/" component={NavBar} exact />

@@ -2,13 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { ChartBarIcon, CurrencyYenIcon, FireIcon } from '@heroicons/react/outline';
 import CountUp from 'react-countup';
+import { useWeb3React } from '@web3-react/core';
+import { Web3Provider } from '@ethersproject/providers';
+
+import { formatAmount } from '../../utils/index';
 
 const getData = async (sweeperContract, provider, setsupplyInfo, setburnInfo): Promise<void> => {
+  if (!provider) {
+    setburnInfo(0);
+    setsupplyInfo('0');
+    return;
+  }
   const totalSupply = await sweeperContract.totalSupply();
-  const ts = ethers.utils.formatEther(totalSupply);
-  const fixedTS = Number(ts).toFixed(3);
-  const nice = ethers.utils.commify(fixedTS);
-  setsupplyInfo(nice);
+  const formattedSupply = formatAmount(totalSupply);
+
+  setsupplyInfo(formattedSupply);
 
   const lastTransfer = await sweeperContract.lastTransfer();
   const adjuster = await sweeperContract.ADJUSTER();
@@ -30,18 +38,19 @@ const getData = async (sweeperContract, provider, setsupplyInfo, setburnInfo): P
 
 interface DashBoardProps {
   sweeperContract: ethers.Contract;
-  provider: ethers.providers.Web3Provider;
-  addEthereum: any;
 }
-const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract, provider, addEthereum }: DashBoardProps) => {
+
+const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract }: DashBoardProps) => {
   const [supplyInfo, setsupplyInfo] = useState('');
   const [burnInfo, setburnInfo] = useState();
 
+  const { library, active, error } = useWeb3React<Web3Provider>();
+
   useEffect(() => {
-    if (sweeperContract) {
-      getData(sweeperContract, provider, setsupplyInfo, setburnInfo);
+    if (sweeperContract && !error) {
+      getData(sweeperContract, library, setsupplyInfo, setburnInfo);
     }
-  }, [sweeperContract, provider]);
+  }, [sweeperContract, library, active]);
 
   return (
     <>
@@ -84,26 +93,13 @@ const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract, provider, addEth
                 Burn Rate:
               </div>
               <div className=" mt-4">
-                <span className={Number(burnInfo) < 0 ? 'text-red-500' : 'text-green-500'}>{`${burnInfo}%`}</span>
+                <span className={Number(burnInfo) < 0 ? 'text-red-500' : 'text-green-500'}>
+                  {burnInfo ? `${burnInfo}%` : '%'}
+                </span>
               </div>
             </div>
           </>
-        ) : (
-          <div className="mr-3 mt-10 overflow-hidden divide-y justify-center text-center text-3xl">
-            <div className="h-full px-4 py-3 sm:px-6 text-white">
-              <button
-                onClick={() => addEthereum()}
-                type="button"
-                className=" inline-flex ml-4 justify-center rounded-md
-                border border-gray-300 shadow-sm px-4 py-2 bg-white text-base
-                font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2
-                focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
-              >
-                Connect wallet to see stats
-              </button>
-            </div>
-          </div>
-        )}
+        ) : null}
       </div>
     </>
   );

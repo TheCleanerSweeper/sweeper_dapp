@@ -2,7 +2,7 @@ import React from 'react';
 import { Popover } from '@headlessui/react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import logo from '../images/logo.svg';
+import logo from '../../images/logo.svg';
 
 const SweepButton = styled.button`
 color: white;
@@ -17,8 +17,6 @@ line-height: 1.5;
 border-radius: 0.3125rem;
 transition: all 0.2s ease-in-out;
 &: hover {
-    // transform: scale(1.01);
-    // position:relative;
     transform: translate(10px)
     box-shadow: 0.5px 0.5px 15px #e6007a;
     background-color: rgba(230, 0, 122, 0.6);
@@ -42,8 +40,8 @@ const NavBar: React.FunctionComponent = () => (
               </a>
             </div>
             <div className=" md:flex items-center justify-end md:flex-1 lg:w-0">
-              <Link to="/app/claim">
-                <SweepButton className="bg-red">Sweep</SweepButton>
+              <Link to="/app/dashboard">
+                <SweepButton className="bg-red">Launch App</SweepButton>
               </Link>
             </div>
           </div>
