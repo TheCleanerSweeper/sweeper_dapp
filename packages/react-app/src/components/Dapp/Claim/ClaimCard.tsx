@@ -73,7 +73,7 @@ const ClaimCard: React.FC<ClaimCardProps> = ({
   setAirdropInfo,
   setAirdropSigner,
 }: ClaimCardProps) => {
-  const { library, account } = useWeb3React<Web3Provider>();
+  const { library, account, active } = useWeb3React<Web3Provider>();
   return (
     <div
       className="mt-16 overflow-hidden shadow rounded-lg justify-center text-center
@@ -103,7 +103,7 @@ const ClaimCard: React.FC<ClaimCardProps> = ({
         {account ? `Address: ${account}` : 'Wallet Not Connected'}
       </div>
 
-      {balance ? (
+      {active ? (
         <div className="flex sm:p-6  text-2xl justify-center text-white">
           Balance:
           <span
