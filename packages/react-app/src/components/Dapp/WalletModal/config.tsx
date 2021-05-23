@@ -6,6 +6,7 @@ import WalletConnectIcon from './icons/WalletConnect';
 // import BinanceChain from './icons/BinanceChain';
 import { injected, network, walletconnect } from '../../../connectors';
 
+/* eslint-disable */
 export interface Config {
   title: string;
   icon: FC<any>;

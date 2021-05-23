@@ -13,6 +13,7 @@ const spinStyle = css`
   animation: ${rotate} 2s linear infinite;
 `;
 
+/* eslint-disable */
 const Svg = styled.svg<any>`
   flex-shrink: 0;
 

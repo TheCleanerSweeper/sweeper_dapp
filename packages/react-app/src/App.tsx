@@ -6,6 +6,7 @@ import Footer from './components/landing/Footer';
 import Landing from './pages/Landing/Landing';
 import Dapp from './pages/Dapp/Dapp';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 function App(): any {
   return (
     <div className="flex flex-col">

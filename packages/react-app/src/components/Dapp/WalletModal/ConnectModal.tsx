@@ -1,5 +1,4 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
 import styled from 'styled-components';
 import { useWeb3React } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
@@ -32,7 +31,7 @@ margin-top: 1rem;
 `;
 
 const ConnectModal: React.FC = () => {
-  const [activatingConnector, setActivatingConnector] = useState<any>();
+  const [activatingConnector, setActivatingConnector] = useState();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   function closeModal(): void {
@@ -67,7 +66,7 @@ const ConnectModal: React.FC = () => {
       </Button>
       <Popup title="Supported Wallets" open={isOpen} setOpen={openModal} onClose={closeModal}>
         <div className="flex flex-row mt-8 mb-8 content-center  justify-between text-white">
-          {config.map((entry, index) => (
+          {config.map((entry) => (
             <WalletCard
               key={entry.title}
               login={setActivatingConnector}
