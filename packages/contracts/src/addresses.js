@@ -7,6 +7,7 @@ const addresses = {
   sweeperdaoBSCMainnet: "0x9Ab776357142694841d42c1abE08c817a7D13400",
   airdropBSCMainnet: "0xC53b71e92213Db600B2d94a5b20a6Aa7D3412a61",
   geyserBSCMainnet: "0x7E4489b7A06ffaDde5559F8F3Ae8bEce0cbB3220",
+  lpSweepBSCMainnet: "0xfd9ef520f3217e14e67e3aba05f878ae2beae405",
 };
 
 export default addresses;
