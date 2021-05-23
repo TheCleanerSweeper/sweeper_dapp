@@ -1,5 +1,6 @@
 import React from 'react';
 /* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable max-len */
 const navigation = [
   {
     name: 'Twitter',

@@ -20,12 +20,12 @@ const checkClaim = async (
   address: string,
   provider: ethers.providers.Web3Provider,
   signer: string | ethers.providers.Provider | ethers.Signer,
-  setClaimableAmount: React.Dispatch<React.SetStateAction<string>>,
-  setShowPopup: any,
+  setClaimableAmount: React.Dispatch<React.SetStateAction<number>>,
+  setShowPopup: React.Dispatch<React.SetStateAction<boolean>>,
   setIsRedeemed: React.Dispatch<React.SetStateAction<boolean>>,
   setExpire: React.Dispatch<React.SetStateAction<Date>>,
   setAirdropInfo: React.Dispatch<React.SetStateAction<AirdropData>>,
-  setAirdropSigner: any,
+  setAirdropSigner: React.Dispatch<React.SetStateAction<ethers.Contract>>,
 ): Promise<void> => {
   const contractAddress: string = addresses.airdropBSCMainnet;
   const abi = abis.airdrop;
@@ -38,7 +38,7 @@ const checkClaim = async (
 
   // The address is not in the airdrop
   if (!airdropInfo) {
-    setClaimableAmount('0');
+    setClaimableAmount(0);
     setIsRedeemed(false);
     setExpire(new Date(0));
   } else {
@@ -50,7 +50,7 @@ const checkClaim = async (
     const date = new Date(expire.toString() * 1000);
 
     setIsRedeemed(isRedeemed);
-    setClaimableAmount(claimableAmount);
+    setClaimableAmount(Number(claimableAmount));
     setExpire(date);
     setAirdropInfo(airdropInfo);
   }
@@ -60,15 +60,15 @@ const checkClaim = async (
 
 interface ClaimCardProps {
   address: string;
-  provider: any;
-  signer: any;
-  balance: any;
-  setClaimableAmount: any;
-  setShowPopup: any;
-  setIsRedeemed: any;
-  setExpire: any;
-  setAirdropInfo: any;
-  setAirdropSigner: any;
+  provider: ethers.providers.Web3Provider;
+  signer: string | ethers.providers.Provider | ethers.Signer;
+  balance: string;
+  setClaimableAmount: React.Dispatch<React.SetStateAction<number>>;
+  setShowPopup: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsRedeemed: React.Dispatch<React.SetStateAction<boolean>>;
+  setExpire: React.Dispatch<React.SetStateAction<Date>>;
+  setAirdropInfo: React.Dispatch<React.SetStateAction<AirdropData>>;
+  setAirdropSigner: React.Dispatch<React.SetStateAction<ethers.Contract>>;
 }
 
 const ClaimCard: React.FC<ClaimCardProps> = ({
@@ -84,7 +84,8 @@ const ClaimCard: React.FC<ClaimCardProps> = ({
   setAirdropSigner,
 }: ClaimCardProps) => (
   <div
-    className="mt-16 overflow-hidden shadow rounded-lg justify-center text-center text-3xl bg-gradient-to-br  from-gray-700 via-gray-800 to-gray-700"
+    className="mt-16 overflow-hidden shadow rounded-lg justify-center text-center
+   text-3xl bg-gradient-to-br  from-gray-700 via-gray-800 to-gray-700"
   >
     <div
       className="flex  justify-center text-center px-4 py-5 sm:px-6
@@ -128,7 +129,8 @@ const ClaimCard: React.FC<ClaimCardProps> = ({
         type="button"
         className="flex w-9/12 inline-flex justify-center
           rounded-md border border-gray-300 shadow-sm mb-10 py-4
-          bg-gradient-to-br from-indigo-500 via-indigo-500 to-indigo-400  text-base font-medium text-white hover:bg-gray-50
+          bg-gradient-to-br from-indigo-500 via-indigo-500 to-indigo-400
+          text-base font-medium text-white hover:bg-gray-50
           focus:outline-none focus:ring-2 focus:ring-offset-2
           focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
         onClick={() => {
@@ -153,11 +155,11 @@ const ClaimCard: React.FC<ClaimCardProps> = ({
 
 interface AirdropProps {
   addr: string;
-  isRedeem: any;
-  claimAmount: any;
-  expiration: any;
-  adInfo: any;
-  adSigner: any;
+  isRedeem: boolean;
+  claimAmount: number;
+  expiration: Date;
+  adInfo: AirdropData;
+  adSigner: ethers.Contract;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -294,7 +296,7 @@ const ClaimAirdropPopup: React.FC<AirdropProps> = ({
                       $SWEEP 🧹
                     </p>
                   </div>
-                  {!isRedeemed && expire > 0 ? (
+                  {!isRedeemed && expire > new Date(0) ? (
                     <div
                       className="mt-2 mb-2 border rounded-md
                     py-6 bg-gray-100"
@@ -378,18 +380,18 @@ const ClaimAirdropPopup: React.FC<AirdropProps> = ({
 };
 
 interface ClaimProps {
-  sweeperBalance: any;
+  sweeperBalance: string;
 }
 
 const Claim: React.FC<ClaimProps> = ({ sweeperBalance }: ClaimProps) => {
-  const [balance, setBalance] = useState(sweeperBalance);
+  const [balance, setBalance] = useState<string>(sweeperBalance);
   const [showPopup, setShowPopup] = useState(false);
   const [claimableAmount, setClaimableAmount] = useState(0);
   const [isRedeemed, setIsRedeemed] = useState(false);
-  const [expire, setExpire] = useState(0);
+  const [expire, setExpire] = useState(new Date(0));
   const [airdropSigner, setAirdropSigner] = useState();
   const [airdropInfo, setAirdropInfo] = useState();
-  const [signer, setSigner] = useState<any>();
+  const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>();
   const [open, setOpen] = useState(true);
 
   // closes the initial popup modal
@@ -401,7 +403,7 @@ const Claim: React.FC<ClaimProps> = ({ sweeperBalance }: ClaimProps) => {
 
   useEffect(() => {
     if (!active) {
-      setBalance(0);
+      setBalance('0');
       return;
     }
     setBalance(sweeperBalance);
@@ -411,7 +413,7 @@ const Claim: React.FC<ClaimProps> = ({ sweeperBalance }: ClaimProps) => {
     if (library) {
       setSigner(library.getSigner(account));
     }
-  }, [library, setSigner, active]);
+  }, [library, setSigner, account]);
 
   return (
     <div>

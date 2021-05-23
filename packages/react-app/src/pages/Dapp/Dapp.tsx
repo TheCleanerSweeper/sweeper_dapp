@@ -70,7 +70,7 @@ const Dapp: React.FC = () => {
   };
 
   useEffect(() => {
-    if (account && !error) {
+    if (account) {
       getSweepBalance(library, account);
     }
   }, [library, account]);
