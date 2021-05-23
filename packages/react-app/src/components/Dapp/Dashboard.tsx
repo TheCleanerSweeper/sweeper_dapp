@@ -44,13 +44,13 @@ const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract }: DashBoardProps
   const [supplyInfo, setsupplyInfo] = useState('');
   const [burnInfo, setburnInfo] = useState();
 
-  const { library, active, error } = useWeb3React<Web3Provider>();
+  const { library } = useWeb3React<Web3Provider>();
 
   useEffect(() => {
-    if (sweeperContract && !error) {
+    if (sweeperContract) {
       getData(sweeperContract, library, setsupplyInfo, setburnInfo);
     }
-  }, [sweeperContract, library, active]);
+  }, [sweeperContract, library]);
 
   return (
     <>

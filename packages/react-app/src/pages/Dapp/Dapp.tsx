@@ -2,7 +2,7 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Route, Switch } from 'react-router-dom';
 import { addresses, abis } from '@project/contracts';
-import { MenuIcon, XIcon, GiftIcon, HomeIcon } from '@heroicons/react/outline';
+import { MenuIcon, XIcon, GiftIcon, HomeIcon, SunIcon } from '@heroicons/react/outline';
 import EthIcon from 'eth-icon';
 import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
@@ -10,6 +10,7 @@ import { Web3Provider } from '@ethersproject/providers';
 
 import logo from '../../images/logo.svg';
 import Claim from '../../components/Dapp/Claim';
+import Geyser from '../../components/Dapp/Geyser';
 import Popup from '../../components/Dapp/Popup';
 import Dashboard from '../../components/Dapp/Dashboard';
 import ConnectModal from '../../components/Dapp/WalletModal/ConnectModal';
@@ -22,6 +23,7 @@ import { useEagerConnect } from '../../hooks/useEagerConnect';
 const navigation = [
   { name: 'Dashboard', href: '#/app/dashboard', icon: HomeIcon, current: true },
   { name: 'Claim', href: '#/app/claim', icon: GiftIcon, current: false },
+  { name: 'Geyser', href: '#/app/geyser', icon: SunIcon, current: false },
   // {
   //   name: "Swap",
   //   href: "#/app/burn",
@@ -45,6 +47,7 @@ const Dapp: React.FC = () => {
   const [walletError, setWalletError] = useState(false);
   const [sweeperBalance, setSweeperBalance] = useState('');
   const [sweeperContract, setsweeperContract] = useState<ethers.Contract>();
+  const [geyserContract, setGeyserContract] = useState<ethers.Contract>();
 
   function closeModal(): void {
     setWalletError(false);
@@ -57,9 +60,7 @@ const Dapp: React.FC = () => {
   useInactiveListener(!triedEager);
 
   const getSweepBalance = async (pvd: ethers.providers.Web3Provider, addr: string): Promise<void> => {
-    const [isRightNetwork, err] = ensureNetwork(pvd);
-
-    if (!pvd || !isRightNetwork) return;
+    if (!pvd) return;
 
     const contractAddress = addresses.sweeperdaoBSCMainnet;
     const abi = abis.sweeperdao;
@@ -71,11 +72,28 @@ const Dapp: React.FC = () => {
     setsweeperContract(contract);
   };
 
+  const setGeyserContractState = async (provider): Promise<void> => {
+    if (!provider) return;
+
+    const contractAddress = addresses.geyserBSCMainnet;
+    const abi = abis.geyser;
+    const contract = new ethers.Contract(contractAddress, abi, provider);
+    setGeyserContract(contract);
+    console.log(contract);
+  };
+
   useEffect(() => {
-    if (account && !error) {
+    if (library && account) {
       getSweepBalance(library, account);
+      setGeyserContractState(library);
     }
   }, [library, account]);
+
+  // useEffect(() => {
+  //   if (library) {
+
+  //   }
+  // }, [library]);
 
   useEffect(() => {
     if (error) {
@@ -221,12 +239,12 @@ const Dapp: React.FC = () => {
                     href={item.href}
                     className={classNames(
                       item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                      'group flex items-center px-2 py-2 text-sm font-medium rounded-md',
+                      'group flex items-center px-2 py-2 text-lg font-medium rounded-md',
                     )}
                   >
                     <item.icon
                       className={classNames(
-                        item.current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300',
+                        item.current ? 'text-indigo-300' : 'text-indigo-400 group-hover:text-indigo-300',
                         'mr-3 h-6 w-6',
                       )}
                       aria-hidden="true"
@@ -282,11 +300,19 @@ const Dapp: React.FC = () => {
           className="flex-1 relative z-0 overflow-y-auto focus:outline-none
         bg-gradient-to-br  from-gray-700 via-gray-600 to-gray-700"
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+          <div className="max-w-8xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="py-2">
               <Switch>
                 <Route path="/app/dashboard" render={() => <Dashboard sweeperContract={sweeperContract} />} />
                 <Route exact path="/app/claim" render={() => <Claim sweeperBalance={sweeperBalance} />} />
+                <Route
+                  path="/app/geyser"
+                  render={() => (
+                    <Geyser
+                      geyserContract={geyserContract}
+                    />
+                  )}
+                />
               </Switch>
             </div>
           </div>
