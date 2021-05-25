@@ -50,7 +50,7 @@ const Dapp: React.FC = () => {
     setWalletError(false);
   }
 
-  const { library, account, error } = useWeb3React<Web3Provider>();
+  const { library, account, active, error } = useWeb3React<Web3Provider>();
 
   const triedEager = useEagerConnect();
 
@@ -167,13 +167,8 @@ const Dapp: React.FC = () => {
                   ))}
                 </nav>
               </div>
-              <div className="flex-shrink-0 flex bg-gray-700 p-4">
-                <a
-                  href={`https://bscscan.com/address/${account}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex-shrink-0 group block"
-                >
+              <div className="flex flex-wrap justify-center flex-shrink-0 bg-gray-700 p-4">
+                {active ? (
                   <div className="flex items-center">
                     <div>
                       <EthIcon
@@ -192,7 +187,8 @@ const Dapp: React.FC = () => {
                       <p className="text-sm font-medium text-white">{account ? shortenAddress(account) : 'None Set'}</p>
                     </div>
                   </div>
-                </a>
+                ) : null}
+                <ConnectModal />
               </div>
             </div>
           </Transition.Child>
@@ -235,7 +231,7 @@ const Dapp: React.FC = () => {
               </nav>
             </div>
             <div className="bg-gray-800 flex justify-center flex-wrap pb-6">
-              {library ? (
+              {active ? (
                 <div className="flex items-center">
                   <div>
                     <EthIcon
