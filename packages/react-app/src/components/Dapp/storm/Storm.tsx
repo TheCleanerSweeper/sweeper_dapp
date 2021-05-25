@@ -11,6 +11,18 @@ import { formatAmount, sleep } from '../../../utils/index';
 import StakeModal from './StakeModal';
 import UnstakeModal from './UnstakeModal';
 
+const setGeyserContractState = async (
+  provider: any,
+  setGeyser: React.Dispatch<React.SetStateAction<ethers.Contract>>,
+): Promise<void> => {
+  if (!provider) return;
+
+  const contractAddress = addresses.geyserBSCMainnet;
+  const abi = abis.geyser;
+  const contract = new ethers.Contract(contractAddress, abi, provider);
+  setGeyser(contract);
+};
+
 const Storm: React.FC = () => {
   const { library, account, active } = useWeb3React<Web3Provider>();
 
@@ -50,19 +62,9 @@ const Storm: React.FC = () => {
   // Timestamp the accounting info was updated
   const [accountingTimestamp, setAccountingTimestamp] = useState<number | string>();
 
-  const setGeyserContractState = async (provider): Promise<void> => {
-    if (!provider) return;
-
-    const contractAddress = addresses.geyserBSCMainnet;
-    const abi = abis.geyser;
-    const contract = new ethers.Contract(contractAddress, abi, provider);
-    setGeyser(contract);
-    console.log(contract);
-  };
-
   useEffect(() => {
     if (active) {
-      setGeyserContractState(library);
+      setGeyserContractState(library, setGeyser);
     }
   }, [library, active]);
 
