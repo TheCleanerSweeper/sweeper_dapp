@@ -24,7 +24,7 @@ transition: all 0.2s ease-in-out;
 }
 `;
 
-const NavBar: React.FunctionComponent = () => (
+const NavBar: React.FC = () => (
   <nav>
     <Popover className="relative bg-white">
       <>
@@ -39,7 +39,12 @@ const NavBar: React.FunctionComponent = () => (
                 <div className="w-auto flex items-center justify-center pl-4 text-3xl">SweeperDAO</div>
               </a>
             </div>
-            <div className=" md:flex items-center justify-end md:flex-1 lg:w-0">
+            <div className="hidden md:flex md:justify-center">
+              <a href="https://docs.sweeperdao.finance/" target="_blank" rel="noreferrer">
+                Documentation
+              </a>
+            </div>
+            <div className="md:flex items-center justify-end md:flex-1 lg:w-0">
               <Link to="/app/dashboard">
                 <SweepButton className="bg-red">Launch App</SweepButton>
               </Link>
