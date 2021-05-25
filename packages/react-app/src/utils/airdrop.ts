@@ -11,13 +11,11 @@ export type AirdropData = {
 
 export const getAirdropInfo = (address: string): AirdropData => {
   // const fs = require("fs");
-  let airdropData: any = data;
+  let airdropData = data;
 
-  // let airdropData = JSON.parse(rawdata);
-  airdropData = airdropData[`${address}`];
-  // airdropData = airdropData["0x949f435a2508f397c42b5b85993132de9600a3b9"];
+  let airdrop = airdropData[address.toLowerCase()];
 
-  return airdropData;
+  return airdrop;
 };
 
 export const getGoerliAirdropInfo = async (address: string) => {

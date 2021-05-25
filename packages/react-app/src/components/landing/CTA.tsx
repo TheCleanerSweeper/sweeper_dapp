@@ -12,10 +12,14 @@ const CTA: React.FunctionComponent = () => (
           </div>
         </div>
 
-        <div className="relative bg-indigo-600 lg:col-start-3 lg:row-start-1 lg:col-span-10 lg:rounded-3xl lg:grid lg:grid-cols-10 lg:items-center">
+        <div
+          className="relative bg-indigo-600 lg:col-start-3 lg:row-start-1 lg:col-span-10
+        lg:rounded-3xl lg:grid lg:grid-cols-10 lg:items-center"
+        >
           <div className="hidden absolute inset-0 overflow-hidden rounded-3xl lg:block" aria-hidden="true">
             <svg
-              className="absolute bottom-full left-full transform translate-y-1/3 -translate-x-2/3 xl:bottom-auto xl:top-0 xl:translate-y-0"
+              className="absolute bottom-full left-full transform translate-y-1/3 -translate-x-2/3
+              xl:bottom-auto xl:top-0 xl:translate-y-0"
               width={404}
               height={384}
               fill="none"
@@ -59,7 +63,10 @@ const CTA: React.FunctionComponent = () => (
               <rect width={404} height={384} fill="url(#64e643ad-2176-4f86-b3d7-f2c5da3b6a6d)" />
             </svg>
           </div>
-          <div className="relative max-w-md mx-auto py-12 px-4 space-y-6 sm:max-w-3xl sm:py-16 sm:px-6 lg:max-w-none lg:p-0 lg:col-start-4 lg:col-span-6">
+          <div
+            className="relative max-w-md mx-auto py-12 px-4 space-y-6 sm:max-w-3xl sm:py-16 sm:px-6 lg:max-w-none
+           lg:p-0 lg:col-start-4 lg:col-span-6"
+          >
             <h2 className="text-3xl font-extrabold text-white" id="join-heading">
               Join Sweeper DAO
             </h2>

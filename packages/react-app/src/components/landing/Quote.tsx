@@ -1,6 +1,7 @@
 import React from 'react';
 import logolight from '../../images/logo-light.svg';
 
+/* eslint-disable max-len */
 const Quote: React.FunctionComponent = () => (
   <div className="bg-white pt-16 lg:py-24">
     <div className="pb-16 bg-indigo-600 lg:pb-0 lg:z-10 lg:relative">

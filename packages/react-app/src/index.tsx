@@ -7,6 +7,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import './index.css';
 import App from './App';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 function getLibrary(provider: any): Web3Provider {
   const library = new Web3Provider(provider);
   library.pollingInterval = 12000;

@@ -9,7 +9,7 @@ import { useWeb3React } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
 
 import logo from '../../images/logo.svg';
-import Claim from '../../components/Dapp/Claim';
+import Claim from '../../components/Dapp/Claim/Claim';
 import Storm from '../../components/Dapp/storm/Storm';
 import Popup from '../../components/Dapp/Popup';
 import Dashboard from '../../components/Dapp/Dashboard';
