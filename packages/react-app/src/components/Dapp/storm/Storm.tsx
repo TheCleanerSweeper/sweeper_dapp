@@ -156,9 +156,11 @@ const Storm: React.FC = () => {
   // The amount of SWEEP a user would get if they unstake
   const getQueryUnstake = async (amount: number): Promise<void> => {
     if (amount) {
-      setOldQueryUnstake(queryUnstake);
+      const old = queryUnstake;
+      setOldQueryUnstake(old);
       const sg = geyser.connect(signer);
       const unstakeAmount = await sg.callStatic.unstakeQuery(amount);
+      console.log(`unstake amount: ${unstakeAmount}`);
       setQueryUnstake(unstakeAmount);
     }
   };
@@ -209,7 +211,7 @@ const Storm: React.FC = () => {
       getQueryUnstake(addrStaked);
       const interval = setInterval(() => {
         getQueryUnstake(addrStaked);
-      }, 1000);
+      }, 5000);
       return () => clearInterval(interval);
     }
   }, [addrStaked, lastUpdated]);
