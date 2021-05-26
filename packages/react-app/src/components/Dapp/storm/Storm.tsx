@@ -51,6 +51,9 @@ const Storm: React.FC = () => {
   const [addrStaked, setAddrStaked] = useState<number>(0);
   // The total number of LP tokens staked by all users
   const [totalStaked, setTotalStaked] = useState<number>(0);
+
+  // the previous amount of query unstake - used to create a diff
+  const [oldQueryUnstake, setOldQueryUnstake] = useState<number | string>(0);
   // the amount of rewards to potentially get
   const [queryUnstake, setQueryUnstake] = useState<number | string>();
 
@@ -153,6 +156,7 @@ const Storm: React.FC = () => {
   // The amount of SWEEP a user would get if they unstake
   const getQueryUnstake = async (amount: number): Promise<void> => {
     if (amount) {
+      setOldQueryUnstake(queryUnstake);
       const sg = geyser.connect(signer);
       const unstakeAmount = await sg.callStatic.unstakeQuery(amount);
       setQueryUnstake(unstakeAmount);
@@ -203,6 +207,10 @@ const Storm: React.FC = () => {
   useEffect(() => {
     if (addrStaked) {
       getQueryUnstake(addrStaked);
+      const interval = setInterval(() => {
+        getQueryUnstake(addrStaked);
+      }, 1000);
+      return () => clearInterval(interval);
     }
   }, [addrStaked, lastUpdated]);
 
@@ -426,7 +434,8 @@ const Storm: React.FC = () => {
                   <CountUp
                     separator=","
                     decimals={6}
-                    duration={1}
+                    duration={22}
+                    start={oldQueryUnstake ? Number(ethers.utils.formatEther(oldQueryUnstake)) : 0}
                     end={queryUnstake ? Number(ethers.utils.formatEther(queryUnstake)) : 0}
                   />
                 </span>
