@@ -5,6 +5,7 @@ import CountUp from 'react-countup';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { addresses, abis } from '@project/contracts';
+import toast, { Toaster } from 'react-hot-toast';
 import logo from '../../../images/logo.svg';
 import bnblogo from '../../../images/bnblogo.svg';
 import { formatAmount, sleep } from '../../../utils/index';
@@ -163,21 +164,18 @@ const Storm: React.FC = () => {
       const sg = geyser.connect(signer);
       const unstakeAmount = ethers.utils.parseUnits(amount.toString(), 18);
 
-      console.log(`unformattedUnstake amount: ${amount}`);
-      console.log(`unstake amount: ${unstakeAmount}`);
-
-      const x = await sg.unstake(unstakeAmount, '0x00');
-
-      console.log('stake result:');
-      console.log(x);
+      const tx = await sg.unstake(unstakeAmount, '0x00');
+      const toastId = toast.loading('Waiting for transaction...', {
+        duration: 50000,
+      });
       setShowUnstakeModal(false);
-
-      await sleep(10000);
-      console.log('done waiting for tx');
-
-      const updated = Date.now();
-      setLastUpdated(updated);
-      getTotalStakedFor(account);
+      library.waitForTransaction(tx.hash).then((receipt: ethers.providers.TransactionReceipt) => {
+        toast.dismiss(toastId);
+        toast.success('tx successful!');
+        const updated = Date.now();
+        setLastUpdated(updated);
+        getTotalStakedFor(account);
+      });
     }
   };
 
@@ -186,17 +184,18 @@ const Storm: React.FC = () => {
       const sg = geyser.connect(signer);
       const stakeAmount = ethers.utils.parseUnits(amount.toString(), 18);
 
-      const x = await sg.stake(stakeAmount, '0x00');
-      console.log('stake result:');
-      console.log(x);
+      const tx = await sg.stake(stakeAmount, '0x00');
+      const toastId = toast.loading('Waiting for transaction...', {
+        duration: 50000,
+      });
       setShowStakeModal(false);
-
-      await sleep(10000);
-      console.log('done waiting for tx');
-
-      const updated = Date.now();
-      setLastUpdated(updated);
-      getTotalStakedFor(account);
+      library.waitForTransaction(tx.hash).then((receipt: ethers.providers.TransactionReceipt) => {
+        toast.dismiss(toastId);
+        toast.success('Tx successful!');
+        const updated = Date.now();
+        setLastUpdated(updated);
+        getTotalStakedFor(account);
+      });
     }
   };
 
