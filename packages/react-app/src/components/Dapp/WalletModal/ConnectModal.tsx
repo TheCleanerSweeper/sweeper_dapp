@@ -30,11 +30,7 @@ margin-top: 1rem;
 }
 `;
 
-interface ConnectModalProps {
-  sidebar: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const ConnectModal: React.FC<ConnectModalProps> = ({ sidebar }: ConnectModalProps) => {
+const ConnectModal: React.FC = () => {
   const [activatingConnector, setActivatingConnector] = useState();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -61,14 +57,12 @@ const ConnectModal: React.FC<ConnectModalProps> = ({ sidebar }: ConnectModalProp
         onClick={() => {
           if (!active) {
             openModal();
-            // sidebar(false);
           } else {
             deactivate();
           }
         }}
       >
         {!active ? 'Connect Wallet' : 'Disconnect Wallet'}
-        {console.log(isOpen)}
       </Button>
       <Popup title="Supported Wallets" open={isOpen} setOpen={openModal} onClose={closeModal}>
         <div className="flex flex-row mt-8 mb-8 content-center  justify-between text-white">

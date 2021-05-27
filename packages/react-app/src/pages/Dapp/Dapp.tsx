@@ -42,7 +42,6 @@ function classNames(...classes): string {
 
 const Dapp: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [emptyOpen, setEmptyOpen] = useState(false);
   const [walletError, setWalletError] = useState(false);
   const [sweeperBalance, setSweeperBalance] = useState('');
   const [sweeperContract, setsweeperContract] = useState<ethers.Contract>();
@@ -189,7 +188,7 @@ const Dapp: React.FC = () => {
                     </div>
                   </div>
                 ) : null}
-                <ConnectModal sidebar={setSidebarOpen} />
+                {active ? <ConnectModal /> : null}
               </div>
             </div>
           </Transition.Child>
@@ -255,7 +254,7 @@ const Dapp: React.FC = () => {
                   </div>
                 </div>
               ) : null}
-              <ConnectModal sidebar={setEmptyOpen} />
+              <ConnectModal />
             </div>
           </div>
         </div>
