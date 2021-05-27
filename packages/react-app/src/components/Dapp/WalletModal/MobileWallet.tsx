@@ -9,7 +9,7 @@ const MobileWallet: React.FC = () => {
   return (
     <>
       {!active ? (
-        <div className="flex justify-center lg:hidden">
+        <div className="flex justify-center md:hidden">
           <ConnectModal />
         </div>
       ) : null}
