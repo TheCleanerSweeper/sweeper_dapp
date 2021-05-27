@@ -188,7 +188,7 @@ const Dapp: React.FC = () => {
                     </div>
                   </div>
                 ) : null}
-                <ConnectModal />
+                {active ? <ConnectModal /> : null}
               </div>
             </div>
           </Transition.Child>
