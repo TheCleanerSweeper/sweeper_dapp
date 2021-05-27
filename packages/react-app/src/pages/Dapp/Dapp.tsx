@@ -23,7 +23,7 @@ import { useEagerConnect } from '../../hooks/useEagerConnect';
 const navigation = [
   { name: 'Dashboard', href: '#/app/dashboard', icon: HomeIcon, current: true },
   { name: 'Claim', href: '#/app/claim', icon: GiftIcon, current: false },
-  { name: 'Storm', href: '#/app/storm', icon: SunIcon, current: false },
+  { name: 'Sweep Storm Geyser', href: '#/app/storm', icon: SunIcon, current: false },
   // {
   //   name: "Swap",
   //   href: "#/app/burn",

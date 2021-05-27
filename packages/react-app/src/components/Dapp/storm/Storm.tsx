@@ -11,6 +11,7 @@ import bnblogo from '../../../images/bnblogo.svg';
 import { formatAmount, sleep } from '../../../utils/index';
 import StakeModal from './StakeModal';
 import UnstakeModal from './UnstakeModal';
+import ConnectModal from '../WalletModal/ConnectModal';
 
 const setGeyserContractState = async (
   provider: any,
@@ -22,6 +23,19 @@ const setGeyserContractState = async (
   const abi = abis.geyser;
   const contract = new ethers.Contract(contractAddress, abi, provider);
   setGeyser(contract);
+};
+
+const setLPContractState = async (
+  provider: any,
+  setLPContract: React.Dispatch<React.SetStateAction<ethers.Contract>>,
+): Promise<void> => {
+  if (!provider) return;
+
+  const contractAddress = addresses.lpSweepBSCMainnet;
+  const abi = abis.lp;
+  const contract = new ethers.Contract(contractAddress, abi, provider);
+
+  setLPContract(contract);
 };
 
 const Storm: React.FC = () => {
@@ -44,6 +58,11 @@ const Storm: React.FC = () => {
 
   // Geyser Contract
   const [geyser, setGeyser] = useState<ethers.Contract>();
+  // Sweep-BNB LP Contract
+  const [lpContract, setLPContract] = useState<ethers.Contract>();
+
+  // The allowance for LP Tokens
+  const [allowance, setAllowance] = useState<number>();
 
   // The balance of LP tokens for the connected address
   const [lpBalance, setlpbBalance] = useState<number>(0);
@@ -52,8 +71,6 @@ const Storm: React.FC = () => {
   // The total number of LP tokens staked by all users
   const [totalStaked, setTotalStaked] = useState<number>(0);
 
-  // the previous amount of query unstake - used to create a diff
-  const [oldQueryUnstake, setOldQueryUnstake] = useState<number | string>(0);
   // the amount of rewards to potentially get
   const [queryUnstake, setQueryUnstake] = useState<number | string>();
 
@@ -69,6 +86,7 @@ const Storm: React.FC = () => {
   useEffect(() => {
     if (active) {
       setGeyserContractState(library, setGeyser);
+      setLPContractState(library, setLPContract);
     }
   }, [library, active]);
 
@@ -104,21 +122,7 @@ const Storm: React.FC = () => {
 
   // Query balance of LP tokens for the address
   const getLPBalance = async (addr: string): Promise<void> => {
-    const contractAddress = addresses.lpSweepBSCMainnet;
-    const abi = abis.sweeperdao;
-    const contract = new ethers.Contract(contractAddress, abi, library);
-
-    // TODO: set LP Contract in state
-    // setLPContract(contract)
-
-    const allowance = await contract.allowance(account, addresses.geyserBSCMainnet);
-
-    const s = contract.connect(signer);
-    if (Number(allowance) === 0) {
-      await s.approve(addresses.geyserBSCMainnet, ethers.constants.MaxUint256);
-    }
-
-    const balance = await contract.balanceOf(addr);
+    const balance = await lpContract.balanceOf(addr);
     const nice = formatAmount(balance);
     setlpbBalance(Number(nice));
   };
@@ -155,54 +159,96 @@ const Storm: React.FC = () => {
 
   // The amount of SWEEP a user would get if they unstake
   const getQueryUnstake = async (amount: number): Promise<void> => {
-    if (amount) {
-      const old = queryUnstake;
-      setOldQueryUnstake(old);
-      const sg = geyser.connect(signer);
-      const unstakeAmount = await sg.callStatic.unstakeQuery(amount);
-      console.log(`unstake amount: ${unstakeAmount}`);
-      setQueryUnstake(unstakeAmount);
+    if (amount && Number(amount) > 0) {
+      try {
+        const sg = geyser.connect(signer);
+        const unstakeAmount = await sg.callStatic.unstakeQuery(amount);
+        setQueryUnstake(unstakeAmount);
+      } catch (e) {
+        console.log('Error fetching unstake query');
+      }
+    }
+  };
+
+  const getLPAllowance = async (addr: string): Promise<void> => {
+    if (addr) {
+      const allowanceAmount = await lpContract.allowance(addr, addresses.geyserBSCMainnet);
+      setAllowance(allowanceAmount);
+    }
+  };
+
+  const allowLP = async (): Promise<void> => {
+    const s = lpContract.connect(signer);
+    if (Number(allowance) === 0) {
+      await s.approve(addresses.geyserBSCMainnet, ethers.constants.MaxUint256);
     }
   };
 
   // Unstake `amount` of tokens
   const unstake = async (amount: number): Promise<void> => {
     if (geyser && signer) {
-      const sg = geyser.connect(signer);
-      const unstakeAmount = ethers.utils.parseUnits(amount.toString(), 18);
+      const s = lpContract.connect(signer);
+      if (Number(allowance) === 0) {
+        const approveTx = await s.approve(addresses.geyserBSCMainnet, ethers.constants.MaxUint256);
+        const approveToastId = toast.loading('Waiting for transaction...', {
+          duration: 50000,
+        });
+        library.waitForTransaction(approveTx.hash).then((receipt: ethers.providers.TransactionReceipt) => {
+          toast.dismiss(approveToastId);
+          toast.success('tx successful!');
+          getLPAllowance(account);
+        });
+      } else {
+        const sg = geyser.connect(signer);
+        const unstakeAmount = ethers.utils.parseUnits(amount.toString(), 18);
 
-      const tx = await sg.unstake(unstakeAmount, '0x00');
-      const toastId = toast.loading('Waiting for transaction...', {
-        duration: 50000,
-      });
-      setShowUnstakeModal(false);
-      library.waitForTransaction(tx.hash).then((receipt: ethers.providers.TransactionReceipt) => {
-        toast.dismiss(toastId);
-        toast.success('tx successful!');
-        const updated = Date.now();
-        setLastUpdated(updated);
-        getTotalStakedFor(account);
-      });
+        const tx = await sg.unstake(unstakeAmount, '0x00');
+        const toastId = toast.loading('Waiting for transaction...', {
+          duration: 50000,
+        });
+        setShowUnstakeModal(false);
+        library.waitForTransaction(tx.hash).then((receipt: ethers.providers.TransactionReceipt) => {
+          toast.dismiss(toastId);
+          toast.success('tx successful!');
+          const updated = Date.now();
+          setLastUpdated(updated);
+          getTotalStakedFor(account);
+          setQueryUnstake(0);
+        });
+      }
     }
   };
 
   const stake = async (amount: string | number): Promise<void> => {
     if (geyser && signer) {
-      const sg = geyser.connect(signer);
-      const stakeAmount = ethers.utils.parseUnits(amount.toString(), 18);
+      const s = lpContract.connect(signer);
+      if (Number(allowance) === 0) {
+        const approveTx = await s.approve(addresses.geyserBSCMainnet, ethers.constants.MaxUint256);
+        const approveToastId = toast.loading('Waiting for transaction...', {
+          duration: 50000,
+        });
+        library.waitForTransaction(approveTx.hash).then((receipt: ethers.providers.TransactionReceipt) => {
+          toast.dismiss(approveToastId);
+          toast.success('tx successful!');
+          getLPAllowance(account);
+        });
+      } else {
+        const sg = geyser.connect(signer);
+        const stakeAmount = ethers.utils.parseUnits(amount.toString(), 18);
 
-      const tx = await sg.stake(stakeAmount, '0x00');
-      const toastId = toast.loading('Waiting for transaction...', {
-        duration: 50000,
-      });
-      setShowStakeModal(false);
-      library.waitForTransaction(tx.hash).then((receipt: ethers.providers.TransactionReceipt) => {
-        toast.dismiss(toastId);
-        toast.success('Tx successful!');
-        const updated = Date.now();
-        setLastUpdated(updated);
-        getTotalStakedFor(account);
-      });
+        const tx = await sg.stake(stakeAmount, '0x00');
+        const toastId = toast.loading('Waiting for transaction...', {
+          duration: 50000,
+        });
+        setShowStakeModal(false);
+        library.waitForTransaction(tx.hash).then((receipt: ethers.providers.TransactionReceipt) => {
+          toast.dismiss(toastId);
+          toast.success('Tx successful!');
+          const updated = Date.now();
+          setLastUpdated(updated);
+          getTotalStakedFor(account);
+        });
+      }
     }
   };
 
@@ -233,11 +279,12 @@ const Storm: React.FC = () => {
   }, [library, setSigner]);
 
   useEffect(() => {
-    if (library && geyser && account) {
+    if (library && geyser && lpContract && account) {
       getAccounting();
       getLPBalance(account);
+      getLPAllowance(account);
     }
-  }, [library, geyser, account, lastUpdated]);
+  }, [library, geyser, lpContract, account, lastUpdated]);
 
   const openStake = (): void => {
     setShowStakeModal(true);
@@ -249,12 +296,13 @@ const Storm: React.FC = () => {
 
   return (
     <>
-      <StakeModal open={showStakeModal} setShowModal={setShowStakeModal} lpBalance={lpBalance} stake={stake} />
+      <StakeModal open={showStakeModal} setShowModal={setShowStakeModal} lpBalance={lpBalance} stake={stake} allowanceAmount={Number(allowance)} />
       <UnstakeModal
         open={showUnstakeModal}
         setShowModal={setShowUnstakeModal}
         addressStaked={addrStaked}
         unstake={unstake}
+        allowanceAmount={Number(allowance)}
       />
 
       {/* HEADING */}
@@ -267,37 +315,43 @@ const Storm: React.FC = () => {
         justify-center"
         >
           <SunIcon className="w-8 mr-4 text-indigo-400" />
-          Geyser
+          Sweep Storm Geyser Liquidity Mining
         </div>
       </div>
 
       {/* STAKE / UNSTAKE BUTTONS  */}
-      <div className="flex flex-wrap justify-center ">
-        <div className=" mt-12 text-xl text-white">
-          <span
-            className="rounded px-8 py-2 mx-5  text-xl bg-gradient-to-br from-indigo-600 via-indigo-800 to-gray-700
+      {/* eslint-disable
+                    no-nested-ternary */}
+      { library ? (
+        <>
+          <div className="flex flex-wrap justify-center">
+            <div className=" mt-12 text-xl text-white">
+              <span
+                className="rounded px-8 py-2 mx-5  text-xl bg-gradient-to-br from-indigo-600 via-indigo-800 to-gray-700
             cursor-pointer hover:text-indigo-300 border border-indigo-700  hover:border hover:border-indigo-500"
-            onClick={() => openStake()}
-            onKeyDown={() => openStake()}
-            role="button"
-            tabIndex={0}
-          >
-            Add Stake
-          </span>
-        </div>
-        <div className=" mt-12 text-xl text-white">
-          <span
-            className="rounded px-8 py-2 mx-5  text-xl bg-gradient-to-br from-gray-600 via-gray-800 to-gray-700
+                onClick={() => openStake()}
+                onKeyDown={() => openStake()}
+                role="button"
+                tabIndex={0}
+              >
+                Add Stake
+              </span>
+            </div>
+            <div className=" mt-12 text-xl text-white">
+              <span
+                className="rounded px-8 py-2 mx-5  text-xl bg-gradient-to-br from-gray-600 via-gray-800 to-gray-700
             cursor-pointer hover:text-indigo-300 border border-gray-700  hover:border hover:border-indigo-500"
-            onClick={() => openUnstake()}
-            onKeyDown={() => openUnstake()}
-            role="button"
-            tabIndex={0}
-          >
-            Remove Stake
-          </span>
-        </div>
-      </div>
+                onClick={() => openUnstake()}
+                onKeyDown={() => openUnstake()}
+                role="button"
+                tabIndex={0}
+              >
+                Remove Stake
+              </span>
+            </div>
+          </div>
+        </>
+      ) : <div className="flex flex-wrap justify-center"><ConnectModal /></div>}
 
       {/* STAKE DETAILS  */}
 
@@ -435,9 +489,10 @@ const Storm: React.FC = () => {
                 <span className="border border-transparent rounded p-2 bg-gray-700">
                   <CountUp
                     separator=","
-                    decimals={6}
-                    duration={22}
-                    start={oldQueryUnstake ? Number(ethers.utils.formatEther(oldQueryUnstake)) : 0}
+                    decimals={10}
+                    duration={25}
+                    preserveValue
+                    start={0}
                     end={queryUnstake ? Number(ethers.utils.formatEther(queryUnstake)) : 0}
                   />
                 </span>

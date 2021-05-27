@@ -14,12 +14,14 @@ interface UnstakeModalProps {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   addressStaked: number;
   unstake: (amount: number | string) => Promise<void>;
+  allowanceAmount: number;
 }
 
-const UnstakeModal: React.FC<UnstakeModalProps> = ({ open, setShowModal, addressStaked, unstake }) => {
+const UnstakeModal: React.FC<UnstakeModalProps> = ({ open, setShowModal, addressStaked, unstake, allowanceAmount }) => {
   const [isOpen, setIsOpen] = useState<boolean>(open);
   const [amount, setAmount] = useState<number | string>();
   const [addrStaked, setAddrStaked] = useState<number>(0);
+  const [allowance, setAllowance] = useState<number>(0);
 
   const [validInput, setValidInput] = useState<boolean>(true);
   const [invalidityReason, setInvalidityReason] = useState<string>();
@@ -30,6 +32,10 @@ const UnstakeModal: React.FC<UnstakeModalProps> = ({ open, setShowModal, address
     setIsOpen(false);
     setShowModal(false);
   };
+
+  useEffect(() => {
+    setAllowance(allowanceAmount);
+  }, [allowanceAmount]);
 
   useEffect(() => {
     setIsOpen(open);
@@ -172,7 +178,7 @@ const UnstakeModal: React.FC<UnstakeModalProps> = ({ open, setShowModal, address
                       <div className="flex justify-center">
                         <input
                           type="text"
-                          value={amount}
+                          value={amount || ''}
                           onChange={(e) => validateInput(e.target.value)}
                           placeholder="BNB-SWEEP LP Amount"
                           className="px-3 py-3 placeholder-indigo-300 text-white relative border border-indigo-700
@@ -226,7 +232,7 @@ const UnstakeModal: React.FC<UnstakeModalProps> = ({ open, setShowModal, address
                       }`}
                     onClick={() => unstake(amount)}
                   >
-                    Unstake
+                    { allowance > 0 ? 'Unstake' : 'Allow' }
                   </button>
                 </div>
               </div>

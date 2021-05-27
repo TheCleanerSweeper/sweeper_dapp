@@ -13,11 +13,13 @@ interface StakeModalProps {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   lpBalance: number;
   stake: (amount: number | string) => Promise<void>;
+  allowanceAmount: number;
 }
-const StakeModal: React.FC<StakeModalProps> = ({ open, setShowModal, lpBalance, stake }) => {
+const StakeModal: React.FC<StakeModalProps> = ({ open, setShowModal, lpBalance, stake, allowanceAmount }) => {
   const [isOpen, setIsOpen] = useState<boolean>(open);
   const [amount, setAmount] = useState<number | string>();
   const [lpBal, setlpbBal] = useState<number>(0);
+  const [allowance, setAllowance] = useState<number>(0);
 
   const [validInput, setValidInput] = useState<boolean>(true);
   const [invalidityReason, setInvalidityReason] = useState<string>();
@@ -28,6 +30,10 @@ const StakeModal: React.FC<StakeModalProps> = ({ open, setShowModal, lpBalance, 
     setIsOpen(false);
     setShowModal(false);
   };
+
+  useEffect(() => {
+    setAllowance(allowanceAmount);
+  }, [allowanceAmount]);
 
   useEffect(() => {
     setIsOpen(open);
@@ -167,7 +173,7 @@ const StakeModal: React.FC<StakeModalProps> = ({ open, setShowModal, lpBalance, 
                       <div className="flex justify-center">
                         <input
                           type="text"
-                          value={amount}
+                          value={amount || ''}
                           onChange={(e) => validateInput(e.target.value)}
                           placeholder="SWEEP Amount"
                           className="px-3 py-3 placeholder-indigo-300 text-white relative border border-indigo-700
@@ -221,7 +227,7 @@ const StakeModal: React.FC<StakeModalProps> = ({ open, setShowModal, lpBalance, 
                     }`}
                     onClick={() => stake(amount)}
                   >
-                    Stake
+                    { allowance > 0 ? 'Stake' : 'Allow' }
                   </button>
                 </div>
               </div>
