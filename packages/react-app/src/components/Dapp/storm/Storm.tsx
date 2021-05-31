@@ -321,7 +321,7 @@ const Storm: React.FC = () => {
         justify-center"
         >
           <SunIcon className="w-8 mr-4 text-indigo-400" />
-          Sweep Storm Geyser Liquidity Mining
+          Sweep Liquidity Mining
         </div>
       </div>
 
