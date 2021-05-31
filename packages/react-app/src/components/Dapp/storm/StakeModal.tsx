@@ -227,7 +227,7 @@ const StakeModal: React.FC<StakeModalProps> = ({ open, setShowModal, lpBalance, 
                     }`}
                     onClick={() => stake(amount)}
                   >
-                    { allowance > 0 ? 'Stake' : 'Allow' }
+                    { allowance > 0 ? 'Stake' : 'Approve' }
                   </button>
                 </div>
               </div>

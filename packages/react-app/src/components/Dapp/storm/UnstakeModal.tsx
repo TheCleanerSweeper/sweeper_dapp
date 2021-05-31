@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import React, { Fragment, useState, useEffect, useRef } from 'react';
-import { FireIcon, SunIcon, BanIcon } from '@heroicons/react/outline';
+import { SunIcon, BanIcon } from '@heroicons/react/outline';
 import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { Dialog, Transition } from '@headlessui/react';
@@ -18,7 +18,6 @@ interface UnstakeModalProps {
 }
 
 const UnstakeModal: React.FC<UnstakeModalProps> = ({ open, setShowModal, addressStaked, unstake, allowanceAmount }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(open);
   const [amount, setAmount] = useState<number | string>();
   const [addrStaked, setAddrStaked] = useState<number>(0);
   const [allowance, setAllowance] = useState<number>(0);
@@ -29,17 +28,12 @@ const UnstakeModal: React.FC<UnstakeModalProps> = ({ open, setShowModal, address
   const { account, active } = useWeb3React<Web3Provider>();
 
   const closeModal = (): void => {
-    setIsOpen(false);
     setShowModal(false);
   };
 
   useEffect(() => {
     setAllowance(allowanceAmount);
   }, [allowanceAmount]);
-
-  useEffect(() => {
-    setIsOpen(open);
-  }, [open]);
 
   useEffect(() => {
     setAddrStaked(addressStaked);
@@ -232,7 +226,7 @@ const UnstakeModal: React.FC<UnstakeModalProps> = ({ open, setShowModal, address
                       }`}
                     onClick={() => unstake(amount)}
                   >
-                    { allowance > 0 ? 'Unstake' : 'Allow' }
+                    { allowance > 0 ? 'Unstake' : 'Approve' }
                   </button>
                 </div>
               </div>

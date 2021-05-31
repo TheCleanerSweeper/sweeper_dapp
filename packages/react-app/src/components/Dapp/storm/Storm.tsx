@@ -8,7 +8,7 @@ import { addresses, abis } from '@project/contracts';
 import toast, { Toaster } from 'react-hot-toast';
 import logo from '../../../images/logo.svg';
 import bnblogo from '../../../images/bnblogo.svg';
-import { formatAmount, sleep } from '../../../utils/index';
+import { formatAmount, sleep } from '../../../utils';
 import StakeModal from './StakeModal';
 import UnstakeModal from './UnstakeModal';
 import ConnectModal from '../WalletModal/ConnectModal';
@@ -296,7 +296,13 @@ const Storm: React.FC = () => {
 
   return (
     <>
-      <StakeModal open={showStakeModal} setShowModal={setShowStakeModal} lpBalance={lpBalance} stake={stake} allowanceAmount={Number(allowance)} />
+      <StakeModal
+        open={showStakeModal}
+        setShowModal={setShowStakeModal}
+        lpBalance={lpBalance}
+        stake={stake}
+        allowanceAmount={Number(allowance)}
+      />
       <UnstakeModal
         open={showUnstakeModal}
         setShowModal={setShowUnstakeModal}
@@ -322,7 +328,7 @@ const Storm: React.FC = () => {
       {/* STAKE / UNSTAKE BUTTONS  */}
       {/* eslint-disable
                     no-nested-ternary */}
-      { library ? (
+      {library ? (
         <>
           <div className="flex flex-wrap justify-center">
             <div className=" mt-12 text-xl text-white">
@@ -351,7 +357,11 @@ const Storm: React.FC = () => {
             </div>
           </div>
         </>
-      ) : <div className="flex flex-wrap justify-center"><ConnectModal /></div>}
+      ) : (
+        <div className="flex flex-wrap justify-center">
+          <ConnectModal />
+        </div>
+      )}
 
       {/* STAKE DETAILS  */}
 
@@ -360,7 +370,7 @@ const Storm: React.FC = () => {
           <div className="flex flex-wrap justify-center">
             {/* ASSET  */}
             <div
-              className="flex-auto w-3 h-52 mr-3 mt-10 overflow-hidden shadow rounded-lg  justify-center text-center
+              className="flex-auto h-52 mr-3 mt-10 overflow-hidden shadow rounded-lg  justify-center text-center
             text-3xl bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 "
             >
               <div className="py-3 sm:px-6 bg-gray-900 text-white flex justify-center">
@@ -387,10 +397,10 @@ const Storm: React.FC = () => {
             </div>
 
             <div
-              className="flex-auto w-3 h-50 mr-3 mt-8 overflow-hidden shadow rounded-lg justify-center text-center
+              className="flex-auto h-50 mr-3 mt-8 overflow-hidden shadow rounded-lg justify-center text-center
             text-3xl bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900"
             >
-              <div className="py-3 sm:px-6 bg-gray-900 text-white flex justify-center">
+              <div className="py-3 sm:px-6 md:pb-3 bg-gray-900 text-white flex justify-center">
                 <CurrencyYenIcon className="w-8 align-top flex text-indigo-400 mr-1" />
                 Geyser:
               </div>
@@ -401,23 +411,18 @@ const Storm: React.FC = () => {
                     separator=","
                     decimals={4}
                     duration={1}
-                    end={totalStaked ? Number(ethers.utils.formatEther(totalStaked)) : 0}
+                    end={totalStaked ? Number(formatAmount(totalStaked)) : 0}
                   />
                 </span>
                 <span className="text-indigo-400 ml-1">SWEEP-BNB LP</span>
               </div>
               <div className="text-white mt-4 text-xl">
                 <span className="border border-transparent rounded p-2 bg-gray-700">
-                  <CountUp
-                    separator=","
-                    decimals={4}
-                    duration={1}
-                    end={totalLocked ? Number(ethers.utils.formatEther(totalLocked.toString())) : 0}
-                  />
+                  {totalLocked ? Number(formatAmount(totalLocked.toString())) : 0}
                 </span>
                 <span className="text-indigo-400 ml-1">SWEEP in Geyser</span>
               </div>
-              <div className="text-white mt-4 text-xl">
+              <div className="text-white mt-4 pb-3 text-xl">
                 <span className="text-indigo-400 ml-1">Ends: </span>
                 <span className="border border-transparent rounded p-2 bg-gray-700">
                   {endDate?.toLocaleDateString('en-gb', {
@@ -439,16 +444,16 @@ const Storm: React.FC = () => {
           <div className="flex flex-wrap justify-center">
             {/* LP BALANCE  */}
             <div
-              className="flex-auto w-3 mr-3 mt-10 overflow-hidden shadow rounded-lg justify-center
+              className="flex-auto mr-3 mt-10 overflow-hidden shadow rounded-lg justify-center
              text-center text-3xl bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900"
             >
               <div className="py-3 sm:px-6 bg-gray-900 text-white flex justify-center">
                 <CurrencyYenIcon className="w-8 align-top flex text-indigo-400 mr-1" />
                 LP Balance:
               </div>
-              <div className="text-white mt-8 text-xl">
+              <div className="text-white text-xl p-3">
                 <span className="border border-transparent rounded p-2 bg-gray-700">
-                  <CountUp separator="," decimals={6} duration={1} end={lpBalance} />
+                  {lpBalance}
                 </span>
                 <span className="text-indigo-400 ml-1">BNB-SWEEP LP</span>
               </div>
@@ -456,21 +461,16 @@ const Storm: React.FC = () => {
 
             {/* POSITION  */}
             <div
-              className="flex-auto w-5 h-50 mr-3 mt-10 overflow-hidden shadow rounded-lg
+              className="flex-auto h-50 mr-3 mt-10 overflow-hidden shadow rounded-lg
             justify-center text-center text-3xl bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 "
             >
               <div className="py-3 sm:px-6 bg-gray-900 text-white flex justify-center">
                 <FireIcon className="w-8 align-top flex text-indigo-400 mr-1" />
                 Position:
               </div>
-              <div className="text-white mt-8 text-xl">
+              <div className="text-white text-xl p-3">
                 <span className="border border-transparent rounded p-2 bg-gray-700">
-                  <CountUp
-                    separator=","
-                    decimals={6}
-                    duration={1}
-                    end={addrStaked ? Number(ethers.utils.formatEther(addrStaked)) : 0}
-                  />
+                  {addrStaked ? Number(formatAmount(addrStaked)) : 0}
                 </span>
                 <span className="text-indigo-400 ml-1">BNB-SWEEP LP Staked</span>
               </div>
@@ -478,23 +478,16 @@ const Storm: React.FC = () => {
 
             {/* EARNINGS  */}
             <div
-              className="flex-auto w-5 h-48 mr-3 mt-10 overflow-hidden shadow rounded-lg
+              className="flex-auto h-30 mr-3 mt-10 overflow-hidden shadow rounded-lg
             justify-center text-center text-3xl bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900 "
             >
               <div className="py-3 sm:px-6 bg-gray-900 text-white flex justify-center">
                 <FireIcon className="w-8 align-top flex text-indigo-400 mr-1" />
                 Earnings:
               </div>
-              <div className="text-white mt-8 text-xl">
+              <div className="text-white p-3 text-xl">
                 <span className="border border-transparent rounded p-2 bg-gray-700">
-                  <CountUp
-                    separator=","
-                    decimals={10}
-                    duration={25}
-                    preserveValue
-                    start={0}
-                    end={queryUnstake ? Number(ethers.utils.formatEther(queryUnstake)) : 0}
-                  />
+                  {queryUnstake ? Number(formatAmount(queryUnstake)) : 0}
                 </span>
                 <span className="text-indigo-400 ml-1">SWEEP earned</span>
               </div>
