@@ -23,7 +23,7 @@ import { useEagerConnect } from '../../hooks/useEagerConnect';
 const navigation = [
   { name: 'Dashboard', href: '#/app/dashboard', icon: HomeIcon, current: true },
   { name: 'Claim', href: '#/app/claim', icon: GiftIcon, current: false },
-  { name: 'Liquidity Mining', href: '#/app/storm', icon: SunIcon, current: false },
+  { name: 'Rewards', href: '#/app/rewards', icon: SunIcon, current: false },
   // {
   //   name: "Swap",
   //   href: "#/app/burn",
@@ -293,7 +293,7 @@ const Dapp: React.FC = () => {
               <Switch>
                 <Route path="/app/dashboard" render={() => <Dashboard sweeperContract={sweeperContract} />} />
                 <Route exact path="/app/claim" render={() => <Claim sweeperBalance={sweeperBalance} />} />
-                <Route path="/app/storm" component={Storm} />
+                <Route path="/app/rewards" component={Storm} />
               </Switch>
             </div>
           </div>
