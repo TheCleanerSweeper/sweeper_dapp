@@ -2,7 +2,7 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Route, Switch } from 'react-router-dom';
 import { addresses, abis } from '@project/contracts';
-import { MenuIcon, XIcon, GiftIcon, HomeIcon } from '@heroicons/react/outline';
+import { MenuIcon, XIcon, GiftIcon, HomeIcon, LightningBoltIcon } from '@heroicons/react/outline';
 import EthIcon from 'eth-icon';
 import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
@@ -12,6 +12,7 @@ import logo from '../../images/logo.svg';
 import Claim from '../../components/Dapp/Claim/Claim';
 import Popup from '../../components/Dapp/Popup';
 import Dashboard from '../../components/Dapp/Dashboard';
+import Burn from '../../components/Dapp/Burn';
 import ConnectModal from '../../components/Dapp/WalletModal/ConnectModal';
 
 import { shortenAddress, formatAmount } from '../../utils/index';
@@ -22,18 +23,7 @@ import { useEagerConnect } from '../../hooks/useEagerConnect';
 const navigation = [
   { name: 'Dashboard', href: '#/app/dashboard', icon: HomeIcon, current: true },
   { name: 'Claim', href: '#/app/claim', icon: GiftIcon, current: false },
-  // {
-  //   name: "Swap",
-  //   href: "#/app/burn",
-  //   icon: SwitchHorizontalIcon,
-  //   current: false,
-  // },
-  // {
-  //   name: "$SWEEP",
-  //   href: "#/app/burn",
-  //   icon: LightningBoltIcon,
-  //   current: false,
-  // },
+  { name: 'Burn', href: '#/app/burn', icon: LightningBoltIcon, current: false },
 ];
 
 function classNames(...classes): string {
@@ -281,6 +271,7 @@ const Dapp: React.FC = () => {
               <Switch>
                 <Route path="/app/dashboard" render={() => <Dashboard sweeperContract={sweeperContract} />} />
                 <Route exact path="/app/claim" render={() => <Claim sweeperBalance={sweeperBalance} />} />
+                <Route exact path="/app/Burn" render={() => <Burn />} />
               </Switch>
             </div>
           </div>
