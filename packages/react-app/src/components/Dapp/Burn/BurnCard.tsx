@@ -4,7 +4,7 @@ import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import EthIcon from 'eth-icon';
 
-import DropDown from './DropDown';
+import Drop from './DropDown';
 import { shortenAddress } from '../../../utils/index';
 
 const burn = async (amount: string | number): Promise<void> => {
@@ -72,8 +72,8 @@ const BurnModal: React.FC = () => {
 
   return (
     <div
-      className="flex items-end justify-center min-h-screen
-       pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+      className="flex items-end justify-center min-h-full
+       pt-4 px-4 pb-20 text-center sm:block sm:pt-4"
     >
       <div
         className="inline-block align-bottom bg-gradient-to-br  from-gray-800 via-gray-900 to-gray-800 rounded-lg
@@ -83,7 +83,7 @@ const BurnModal: React.FC = () => {
         <div className="text-center">
           {/* HEADER  */}
           <div className="mb-3 pt-0 text-white">
-            <div className="flex sm:p-6 h-auto h-auto text-xl  mt-4 justify-center text-indigo-200">
+            <div className="flex sm:p-6 sm:mb-3 h-auto h-auto text-xl mb-4 justify-center text-indigo-200">
               {account ? (
                 <EthIcon
                   className="inline-block h-9 w-9 rounded-full mx-3"
@@ -101,9 +101,11 @@ const BurnModal: React.FC = () => {
             </div>
 
             {/* LP BALANCE ROW  */}
-            <div className="flex justify-center mb-6 border rounded py-4 border-indigo-400 border-opacity-10">
-              <div className="align-baseline flex mt-2 pr-4">Shitcoins: </div>
-              <div className="align-baseline flex mt-2">{/* <DropDown /> */}</div>
+            <div className="flex flex-wrap pl-8 mb-6 border rounded py-4 border-indigo-400 border-opacity-10">
+              <div className="flex mt-2 pr-4">Shitcoins: </div>
+              <div className="flex mb-4">
+                <Drop />
+              </div>
             </div>
 
             {/* INVALIDITY ROW */}
