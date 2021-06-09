@@ -16,7 +16,6 @@ interface StakeModalProps {
   allowanceAmount: number;
 }
 const StakeModal: React.FC<StakeModalProps> = ({ open, setShowModal, lpBalance, stake, allowanceAmount }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(open);
   const [amount, setAmount] = useState<number | string>();
   const [lpBal, setlpbBal] = useState<number>(0);
   const [allowance, setAllowance] = useState<number>(0);
@@ -27,17 +26,12 @@ const StakeModal: React.FC<StakeModalProps> = ({ open, setShowModal, lpBalance, 
   const { account, active } = useWeb3React<Web3Provider>();
 
   const closeModal = (): void => {
-    setIsOpen(false);
     setShowModal(false);
   };
 
   useEffect(() => {
     setAllowance(allowanceAmount);
   }, [allowanceAmount]);
-
-  useEffect(() => {
-    setIsOpen(open);
-  }, [open]);
 
   useEffect(() => {
     setlpbBal(lpBalance);
@@ -60,7 +54,7 @@ const StakeModal: React.FC<StakeModalProps> = ({ open, setShowModal, lpBalance, 
 
   useEffect(() => {
     validateInput(amount);
-  }, [amount]);
+  }, [amount]); // eslint-disable-line
 
   const cancelButtonRef = useRef();
 
@@ -227,7 +221,7 @@ const StakeModal: React.FC<StakeModalProps> = ({ open, setShowModal, lpBalance, 
                     }`}
                     onClick={() => stake(amount)}
                   >
-                    { allowance > 0 ? 'Stake' : 'Approve' }
+                    {allowance > 0 ? 'Stake' : 'Approve'}
                   </button>
                 </div>
               </div>

@@ -2,19 +2,19 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { CurrencyYenIcon, FireIcon, SunIcon } from '@heroicons/react/outline';
 import CountUp from 'react-countup';
-import { Web3Provider } from '@ethersproject/providers';
+import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { addresses, abis } from '@project/contracts';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import logo from '../../../images/logo.svg';
 import bnblogo from '../../../images/bnblogo.svg';
-import { formatAmount, sleep } from '../../../utils';
+import { formatAmount } from '../../../utils';
 import StakeModal from './StakeModal';
 import UnstakeModal from './UnstakeModal';
 import ConnectModal from '../WalletModal/ConnectModal';
 
 const setGeyserContractState = async (
-  provider: any,
+  provider: Web3Provider,
   setGeyser: React.Dispatch<React.SetStateAction<ethers.Contract>>,
 ): Promise<void> => {
   if (!provider) return;
@@ -26,7 +26,7 @@ const setGeyserContractState = async (
 };
 
 const setLPContractState = async (
-  provider: any,
+  provider: Web3Provider,
   setLPContract: React.Dispatch<React.SetStateAction<ethers.Contract>>,
 ): Promise<void> => {
   if (!provider) return;
@@ -41,7 +41,7 @@ const setLPContractState = async (
 const Storm: React.FC = () => {
   const { library, account, active } = useWeb3React<Web3Provider>();
 
-  const [signer, setSigner] = useState<any>();
+  const [signer, setSigner] = useState<JsonRpcSigner>();
 
   // Modal for sending a "Stake" transaction
   const [showStakeModal, setShowStakeModal] = useState(false);
@@ -49,9 +49,9 @@ const Storm: React.FC = () => {
   const [showUnstakeModal, setShowUnstakeModal] = useState(false);
 
   // Staking Token address
-  const [stakingTokenAddress, setStakingTokenAddress] = useState<string>();
+  const [stakingTokenAddress, setStakingTokenAddress] = useState<string>(); // eslint-disable-line
   // Distribution Token address
-  const [distributionTokenAddress, setDistributionTokenAddress] = useState<string>();
+  const [distributionTokenAddress, setDistributionTokenAddress] = useState<string>(); // eslint-disable-line
 
   // The Geyser end date
   const [endDate, setEndDate] = useState<Date>();
@@ -75,13 +75,13 @@ const Storm: React.FC = () => {
   const [queryUnstake, setQueryUnstake] = useState<number | string>();
 
   // The amount of tokens locked in the geyser
-  const [lockedGeyserBalance, setLockedGeyserBalance] = useState<number | string>();
+  const [lockedGeyserBalance, setLockedGeyserBalance] = useState<number | string>(); // eslint-disable-line
   // the amount of tokens unlocked in the geyser
-  const [unlockedGeyserBalance, setUnlockedGeyserBalance] = useState<number | string>();
+  const [unlockedGeyserBalance, setUnlockedGeyserBalance] = useState<number | string>(); // eslint-disable-line
   // total SWEEP locked in the geyser
   const [totalLocked, setTotalLocked] = useState<number | string>();
   // Timestamp the accounting info was updated
-  const [accountingTimestamp, setAccountingTimestamp] = useState<number | string>();
+  const [accountingTimestamp, setAccountingTimestamp] = useState<number | string>(); // eslint-disable-line
 
   useEffect(() => {
     if (active) {
@@ -165,7 +165,7 @@ const Storm: React.FC = () => {
         const unstakeAmount = await sg.callStatic.unstakeQuery(amount);
         setQueryUnstake(unstakeAmount);
       } catch (e) {
-        console.log('Error fetching unstake query');
+        console.log('Error fetching unstake query'); // eslint-disable-line
       }
     }
   };
@@ -174,13 +174,6 @@ const Storm: React.FC = () => {
     if (addr) {
       const allowanceAmount = await lpContract.allowance(addr, addresses.geyserBSCMainnet);
       setAllowance(allowanceAmount);
-    }
-  };
-
-  const allowLP = async (): Promise<void> => {
-    const s = lpContract.connect(signer);
-    if (Number(allowance) === 0) {
-      await s.approve(addresses.geyserBSCMainnet, ethers.constants.MaxUint256);
     }
   };
 
@@ -193,7 +186,9 @@ const Storm: React.FC = () => {
         const approveToastId = toast.loading('Waiting for transaction...', {
           duration: 50000,
         });
+        /* eslint-disable */
         library.waitForTransaction(approveTx.hash).then((receipt: ethers.providers.TransactionReceipt) => {
+          /* eslint-enable */
           toast.dismiss(approveToastId);
           toast.success('tx successful!');
           getLPAllowance(account);
@@ -207,7 +202,9 @@ const Storm: React.FC = () => {
           duration: 50000,
         });
         setShowUnstakeModal(false);
+        /* eslint-disable */
         library.waitForTransaction(tx.hash).then((receipt: ethers.providers.TransactionReceipt) => {
+          /* eslint-enable */
           toast.dismiss(toastId);
           toast.success('tx successful!');
           const updated = Date.now();
@@ -227,7 +224,9 @@ const Storm: React.FC = () => {
         const approveToastId = toast.loading('Waiting for transaction...', {
           duration: 50000,
         });
+        /* eslint-disable */
         library.waitForTransaction(approveTx.hash).then((receipt: ethers.providers.TransactionReceipt) => {
+          /* eslint-enable */
           toast.dismiss(approveToastId);
           toast.success('tx successful!');
           getLPAllowance(account);
@@ -241,7 +240,9 @@ const Storm: React.FC = () => {
           duration: 50000,
         });
         setShowStakeModal(false);
+        /* eslint-disable */
         library.waitForTransaction(tx.hash).then((receipt: ethers.providers.TransactionReceipt) => {
+          /* eslint-enable */
           toast.dismiss(toastId);
           toast.success('Tx successful!');
           const updated = Date.now();
@@ -260,7 +261,7 @@ const Storm: React.FC = () => {
       }, 5000);
       return () => clearInterval(interval);
     }
-  }, [addrStaked, lastUpdated]);
+  }, [addrStaked, lastUpdated]); // eslint-disable-line
 
   useEffect(() => {
     if (geyser && account) {
@@ -270,13 +271,13 @@ const Storm: React.FC = () => {
       getTotalStaked();
       getSchedule();
     }
-  }, [geyser, account, lastUpdated]);
+  }, [geyser, account, lastUpdated]); // eslint-disable-line
 
   useEffect(() => {
     if (library) {
       setSigner(library.getSigner(account));
     }
-  }, [library, setSigner]);
+  }, [library, setSigner]); // eslint-disable-line
 
   useEffect(() => {
     if (library && geyser && lpContract && account) {
@@ -284,7 +285,7 @@ const Storm: React.FC = () => {
       getLPBalance(account);
       getLPAllowance(account);
     }
-  }, [library, geyser, lpContract, account, lastUpdated]);
+  }, [library, geyser, lpContract, account, lastUpdated]); // eslint-disable-line
 
   const openStake = (): void => {
     setShowStakeModal(true);
@@ -452,9 +453,7 @@ const Storm: React.FC = () => {
                 LP Balance:
               </div>
               <div className="text-white text-xl p-3">
-                <span className="border border-transparent rounded p-2 bg-gray-700">
-                  {lpBalance}
-                </span>
+                <span className="border border-transparent rounded p-2 bg-gray-700">{lpBalance}</span>
                 <span className="text-indigo-400 ml-1">BNB-SWEEP LP</span>
               </div>
             </div>

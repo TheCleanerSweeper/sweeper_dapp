@@ -2,7 +2,7 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Route, Switch } from 'react-router-dom';
 import { addresses, abis } from '@project/contracts';
-import { MenuIcon, XIcon, GiftIcon, HomeIcon, SunIcon } from '@heroicons/react/outline';
+import { MenuIcon, XIcon, GiftIcon, HomeIcon } from '@heroicons/react/outline';
 import EthIcon from 'eth-icon';
 import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
@@ -23,7 +23,7 @@ import { useEagerConnect } from '../../hooks/useEagerConnect';
 const navigation = [
   { name: 'Dashboard', href: '#/app/dashboard', icon: HomeIcon, current: true },
   { name: 'Claim', href: '#/app/claim', icon: GiftIcon, current: false },
-  { name: 'Rewards', href: '#/app/rewards', icon: SunIcon, current: false },
+  // { name: 'Rewards', href: '#/app/rewards', icon: SunIcon, current: false },
   // {
   //   name: "Swap",
   //   href: "#/app/burn",

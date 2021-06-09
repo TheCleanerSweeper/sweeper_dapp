@@ -57,7 +57,7 @@ const UnstakeModal: React.FC<UnstakeModalProps> = ({ open, setShowModal, address
 
   useEffect(() => {
     validateInput(amount);
-  }, [amount]);
+  }, [amount]); // eslint-disable-line
 
   const cancelButtonRef = useRef();
 
@@ -226,7 +226,7 @@ const UnstakeModal: React.FC<UnstakeModalProps> = ({ open, setShowModal, address
                       }`}
                     onClick={() => unstake(amount)}
                   >
-                    { allowance > 0 ? 'Unstake' : 'Approve' }
+                    {allowance > 0 ? 'Unstake' : 'Approve'}
                   </button>
                 </div>
               </div>
