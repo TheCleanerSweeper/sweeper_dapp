@@ -9,6 +9,7 @@ import Popup from '../Popup';
 import ClaimCard from './ClaimCard';
 import ClaimAirdropPopup from './AirdropPopup';
 import FallingBunnies from '../../Effects.js';
+import MobileWallet from '../WalletModal/MobileWallet';
 
 interface ClaimProps {
   sweeperBalance: string;
@@ -59,6 +60,7 @@ const Claim: React.FC<ClaimProps> = ({ sweeperBalance }: ClaimProps) => {
         setAirdropInfo={setAirdropInfo}
         setAirdropSigner={setAirdropSigner}
       />
+      <MobileWallet />
       <Popup title="Claim Airdrop" open={open} setOpen={setOpen} onClose={closeModal}>
         <p className="text-sm text-gray-500">
           Allocations of $SWEEP are airdropped to rugpull victims and community contributers. Continue on to check if

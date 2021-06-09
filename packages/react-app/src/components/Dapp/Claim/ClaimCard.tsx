@@ -7,6 +7,7 @@ import { useWeb3React } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
 
 import { getAirdropInfo, getClaimableAmount, AirdropData } from '../../../utils/airdrop';
+import { shortenAddress } from '../../../utils/index';
 
 const checkClaim = async (
   address: string,
@@ -100,11 +101,12 @@ const ClaimCard: React.FC<ClaimCardProps> = ({
             }}
           />
         ) : null}
-        {account ? `Address: ${account}` : 'Wallet Not Connected'}
+        <div className="hidden lg:flex">{active ? `Address:  ${account}` : 'Wallet Not Connected'}</div>
+        <div className="lg:hidden">{active ? `Address:  ${shortenAddress(account)}` : 'Wallet Not Connected'}</div>
       </div>
 
       {active ? (
-        <div className="flex sm:p-6  text-2xl justify-center text-white">
+        <div className="mt-2 md:mt-0 flex text-2xl justify-center text-white">
           Balance:
           <span
             className="rounded-md border border-gray-300 pt-2
@@ -116,7 +118,7 @@ const ClaimCard: React.FC<ClaimCardProps> = ({
         </div>
       ) : null}
 
-      {account ? (
+      {active ? (
         <button
           type="button"
           className="flex w-9/12 inline-flex justify-center

@@ -5,9 +5,9 @@ const addresses = {
   airdropGoerli: "0x4c4b93128eA09aAF623905242AFe92c3E425225D",
   sweeperdaoGoerli: "0x59A54fAbc474517180Ae26Db7cd057DD7a462Ff0",
   sweeperdaoBSCMainnet: "0x9Ab776357142694841d42c1abE08c817a7D13400",
-  airdropBSCMainnet: "0xC53b71e92213Db600B2d94a5b20a6Aa7D3412a61",
   geyserBSCMainnet: "0x7E4489b7A06ffaDde5559F8F3Ae8bEce0cbB3220",
   lpSweepBSCMainnet: "0xfd9ef520f3217e14e67e3aba05f878ae2beae405",
+  airdropBSCMainnet: "0x65A017Cb8F4E840d2EE111CEbFCA602Cf2290873",
 };
 
 export default addresses;
