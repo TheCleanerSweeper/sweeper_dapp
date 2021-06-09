@@ -8,7 +8,12 @@ import { ethers } from 'ethers';
 import { AirdropData } from '../../../utils/airdrop';
 
 const redeem = async (address, amount, airdropInfo, airdropSigner): Promise<void> => {
-  await airdropSigner.redeemPackage(airdropInfo.index, address, amount.toLocaleString('fullwide', { useGrouping: false }), airdropInfo.proof);
+  await airdropSigner.redeemPackage(
+    airdropInfo.index,
+    address,
+    amount.toLocaleString('fullwide', { useGrouping: false }),
+    airdropInfo.proof,
+  );
 };
 interface AirdropProps {
   isRedeem: boolean;
