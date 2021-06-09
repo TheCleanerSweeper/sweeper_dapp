@@ -4,6 +4,7 @@ import { ChartBarIcon, CurrencyYenIcon, FireIcon } from '@heroicons/react/outlin
 import CountUp from 'react-countup';
 import { useWeb3React } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
+import MobileWallet from './WalletModal/MobileWallet';
 
 import { formatAmount } from '../../utils/index';
 
@@ -66,6 +67,7 @@ const Dashboard: React.FC<DashBoardProps> = ({ sweeperContract }: DashBoardProps
           Dashboard
         </div>
       </div>
+      <MobileWallet />
       <div className="flex flex-wrap justify-center">
         {sweeperContract ? (
           <>

@@ -2,28 +2,28 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Route, Switch } from 'react-router-dom';
 import { addresses, abis } from '@project/contracts';
-import { MenuIcon, XIcon, GiftIcon, HomeIcon, SunIcon } from '@heroicons/react/outline';
+import { MenuIcon, XIcon, GiftIcon, HomeIcon } from '@heroicons/react/outline';
 import EthIcon from 'eth-icon';
 import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
 
 import logo from '../../images/logo.svg';
-import Claim from '../../components/Dapp/Claim';
-import Geyser from '../../components/Dapp/Geyser';
+import Claim from '../../components/Dapp/Claim/Claim';
+import Storm from '../../components/Dapp/storm/Storm';
 import Popup from '../../components/Dapp/Popup';
 import Dashboard from '../../components/Dapp/Dashboard';
 import ConnectModal from '../../components/Dapp/WalletModal/ConnectModal';
 
 import { shortenAddress, formatAmount } from '../../utils/index';
-import { ensureNetwork, getErrorMessage } from '../../utils/error';
+import { getErrorMessage } from '../../utils/error';
 import { useInactiveListener } from '../../hooks/useInactiveListener';
 import { useEagerConnect } from '../../hooks/useEagerConnect';
 
 const navigation = [
   { name: 'Dashboard', href: '#/app/dashboard', icon: HomeIcon, current: true },
   { name: 'Claim', href: '#/app/claim', icon: GiftIcon, current: false },
-  { name: 'Geyser', href: '#/app/geyser', icon: SunIcon, current: false },
+  // { name: 'Rewards', href: '#/app/rewards', icon: SunIcon, current: false },
   // {
   //   name: "Swap",
   //   href: "#/app/burn",
@@ -47,13 +47,12 @@ const Dapp: React.FC = () => {
   const [walletError, setWalletError] = useState(false);
   const [sweeperBalance, setSweeperBalance] = useState('');
   const [sweeperContract, setsweeperContract] = useState<ethers.Contract>();
-  const [geyserContract, setGeyserContract] = useState<ethers.Contract>();
 
   function closeModal(): void {
     setWalletError(false);
   }
 
-  const { library, account, error } = useWeb3React<Web3Provider>();
+  const { library, account, active, error } = useWeb3React<Web3Provider>();
 
   const triedEager = useEagerConnect();
 
@@ -72,20 +71,9 @@ const Dapp: React.FC = () => {
     setsweeperContract(contract);
   };
 
-  const setGeyserContractState = async (provider): Promise<void> => {
-    if (!provider) return;
-
-    const contractAddress = addresses.geyserBSCMainnet;
-    const abi = abis.geyser;
-    const contract = new ethers.Contract(contractAddress, abi, provider);
-    setGeyserContract(contract);
-    console.log(contract);
-  };
-
   useEffect(() => {
     if (library && account) {
       getSweepBalance(library, account);
-      setGeyserContractState(library);
     }
   }, [library, account]);
 
@@ -187,13 +175,8 @@ const Dapp: React.FC = () => {
                   ))}
                 </nav>
               </div>
-              <div className="flex-shrink-0 flex bg-gray-700 p-4">
-                <a
-                  href={`https://bscscan.com/address/${account}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex-shrink-0 group block"
-                >
+              <div className="flex flex-wrap justify-center flex-shrink-0 bg-gray-700 p-4">
+                {active ? (
                   <div className="flex items-center">
                     <div>
                       <EthIcon
@@ -212,7 +195,8 @@ const Dapp: React.FC = () => {
                       <p className="text-sm font-medium text-white">{account ? shortenAddress(account) : 'None Set'}</p>
                     </div>
                   </div>
-                </a>
+                ) : null}
+                {active ? <ConnectModal /> : null}
               </div>
             </div>
           </Transition.Child>
@@ -255,7 +239,7 @@ const Dapp: React.FC = () => {
               </nav>
             </div>
             <div className="bg-gray-800 flex justify-center flex-wrap pb-6">
-              {library ? (
+              {active ? (
                 <div className="flex items-center">
                   <div>
                     <EthIcon
@@ -305,14 +289,7 @@ const Dapp: React.FC = () => {
               <Switch>
                 <Route path="/app/dashboard" render={() => <Dashboard sweeperContract={sweeperContract} />} />
                 <Route exact path="/app/claim" render={() => <Claim sweeperBalance={sweeperBalance} />} />
-                <Route
-                  path="/app/geyser"
-                  render={() => (
-                    <Geyser
-                      geyserContract={geyserContract}
-                    />
-                  )}
-                />
+                <Route path="/app/rewards" component={Storm} />
               </Switch>
             </div>
           </div>

@@ -7,7 +7,7 @@ const RPC: { [chainId: number]: string } = {
   56: 'https://bsc-dataseed.binance.org/',
 };
 
-export const injected = new InjectedConnector({ supportedChainIds: [56, 5] });
+export const injected = new InjectedConnector({ supportedChainIds: [56] });
 
 export const network = new NetworkConnector({
   urls: { 56: RPC[56] },
