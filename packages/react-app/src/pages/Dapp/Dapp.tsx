@@ -10,6 +10,7 @@ import { Web3Provider } from '@ethersproject/providers';
 
 import logo from '../../images/logo.svg';
 import Claim from '../../components/Dapp/Claim/Claim';
+import Storm from '../../components/Dapp/storm/Storm';
 import Popup from '../../components/Dapp/Popup';
 import Dashboard from '../../components/Dapp/Dashboard';
 import ConnectModal from '../../components/Dapp/WalletModal/ConnectModal';
@@ -22,6 +23,7 @@ import { useEagerConnect } from '../../hooks/useEagerConnect';
 const navigation = [
   { name: 'Dashboard', href: '#/app/dashboard', icon: HomeIcon, current: true },
   { name: 'Claim', href: '#/app/claim', icon: GiftIcon, current: false },
+  // { name: 'Rewards', href: '#/app/rewards', icon: SunIcon, current: false },
   // {
   //   name: "Swap",
   //   href: "#/app/burn",
@@ -70,10 +72,16 @@ const Dapp: React.FC = () => {
   };
 
   useEffect(() => {
-    if (account) {
+    if (library && account) {
       getSweepBalance(library, account);
     }
   }, [library, account]);
+
+  // useEffect(() => {
+  //   if (library) {
+
+  //   }
+  // }, [library]);
 
   useEffect(() => {
     if (error) {
@@ -215,12 +223,12 @@ const Dapp: React.FC = () => {
                     href={item.href}
                     className={classNames(
                       item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                      'group flex items-center px-2 py-2 text-sm font-medium rounded-md',
+                      'group flex items-center px-2 py-2 text-lg font-medium rounded-md',
                     )}
                   >
                     <item.icon
                       className={classNames(
-                        item.current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300',
+                        item.current ? 'text-indigo-300' : 'text-indigo-400 group-hover:text-indigo-300',
                         'mr-3 h-6 w-6',
                       )}
                       aria-hidden="true"
@@ -276,11 +284,12 @@ const Dapp: React.FC = () => {
           className="flex-1 relative z-0 overflow-y-auto focus:outline-none
         bg-gradient-to-br  from-gray-700 via-gray-600 to-gray-700"
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+          <div className="max-w-8xl mx-auto px-4 sm:px-6 md:px-8">
             <div className="py-2">
               <Switch>
                 <Route path="/app/dashboard" render={() => <Dashboard sweeperContract={sweeperContract} />} />
                 <Route exact path="/app/claim" render={() => <Claim sweeperBalance={sweeperBalance} />} />
+                <Route path="/app/rewards" component={Storm} />
               </Switch>
             </div>
           </div>
