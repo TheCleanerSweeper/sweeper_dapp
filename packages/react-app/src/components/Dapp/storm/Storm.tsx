@@ -111,7 +111,7 @@ const Storm: React.FC = () => {
   // The end date of the geyser
   const getSchedule = async (): Promise<void> => {
     const bonusPeriod = await geyser.bonusPeriodSec();
-    const schedule = await geyser.unlockSchedules(0);
+    const schedule = await geyser.unlockSchedules(1);
     const endSec = schedule[3];
     const end = (Number(bonusPeriod) + Number(endSec)) * 1000;
 
